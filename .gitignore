@@ -1,0 +1,8 @@
+*.py[co]
+__pycache__
+.idea
+venv/
+.venv/
+*.dat
+data/
+
