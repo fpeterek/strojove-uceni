@@ -25,7 +25,7 @@ class Clustering(
           (i, j) -> (clusters(i) distanceFrom clusters(j))
         }
       }
-      .maxBy(_._2)
+      .minBy(_._2)
       ._1
 
   private def joinClusters(clusters: Seq[Cluster], indices: (Int, Int)): Cluster =

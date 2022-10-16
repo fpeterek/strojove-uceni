@@ -7,25 +7,28 @@ import matplotlib.pyplot as plt
 def load_file(filename: str) -> tuple[list[float], list[float], list[int]]:
     xs = []
     ys = []
-    clusters = []
+    cluster_labels = []
     with open(filename) as file:
-        cl = json.load(file)['clusters']
-        for idx, cluster in enumerate(cl):
+        print(f'Loading {filename}')
+        clusters = json.load(file)['clusters']
+        for idx, cluster in enumerate(clusters):
             for point in cluster:
                 xs.append(point['x'])
                 ys.append(point['y'])
-                clusters.append(idx)
+                cluster_labels.append(idx)
 
-    return xs, ys, clusters
+    return xs, ys, cluster_labels
 
 
-def plot_clusters(files: list[str], pair: tuple[str, str], fig, row):
+def plot_clusters(files: list[str], clustering: tuple[str, str], fig, row):
+    linkage, metric = clustering
     axes = [fig.axes[3*row], fig.axes[3*row + 1], fig.axes[3*row + 2]]
 
-    for ax, clusters in zip(axes, [2, 3, 5]):
-        file = [f for f in files if str(clusters) in f][0]
-        xs, ys, clusters = load_file(file)
-        ax.scatter(xs, ys, c=clusters)
+    for ax, num_clusters in zip(axes, [2, 3, 5]):
+        file = [f for f in files if f[-6] == str(num_clusters)][0]
+        xs, ys, cl_labels = load_file(file)
+        ax.set_title(f'{linkage}, {metric}')
+        ax.scatter(xs, ys, c=cl_labels)
 
 
 def plot_group(group, files: list[str]):
@@ -48,14 +51,31 @@ def last_index_of(string, substr) -> int:
     return len(string) - string[::-1].index(substr) - 1
 
 
-def main(to_plot: list[str]) -> None:
-    groups = set(map(lambda x: x[last_index_of(x, '/')+1:x.index('_')], to_plot))
-    groups = [g for g in groups if 'annulus' in g]
+def parse_group(filename: str) -> str:
+    return filename[last_index_of(filename, '/')+1:filename.index('_')]
 
-    for group in groups:
-        to_process = [it for it in to_plot if group in it]
-        # print(to_process)
-        plot_group(group, to_process)
+
+def group_inputs(inputs: list[str]):
+    grouped = dict()
+
+    for i in inputs:
+        group = parse_group(i)
+        lst = grouped.get(group, [])
+        lst.append(i)
+        grouped[group] = lst
+
+    return grouped
+
+
+def main(to_plot: list[str]) -> None:
+
+    grouped = group_inputs(to_plot)
+
+    for (group, files) in grouped.items():
+        if len(files) != 12:
+            continue
+        # print(files)
+        plot_group(group, files)
 
 
 if __name__ == '__main__':
