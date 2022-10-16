@@ -5,8 +5,7 @@ import scala.io.Source
 
 import org.fpeterek.su.clustering.util.CloseableSource.CloseSource
 
-object DatasetLoader {
-
+object DatasetLoader:
   def apply(filename: String): List[Point] =
     Source.fromFile(filename).use { src =>
       src
@@ -18,6 +17,3 @@ object DatasetLoader {
         }
         .toList
     }
-
-
-}

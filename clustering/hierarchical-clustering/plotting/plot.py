@@ -74,7 +74,6 @@ def main(to_plot: list[str]) -> None:
     for (group, files) in grouped.items():
         if len(files) != 12:
             continue
-        # print(files)
         plot_group(group, files)
 
 

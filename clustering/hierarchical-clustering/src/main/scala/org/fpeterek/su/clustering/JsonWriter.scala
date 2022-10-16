@@ -4,7 +4,7 @@ import org.json.{JSONArray, JSONObject}
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
 
-object JsonWriter {
+object JsonWriter:
 
   private def pointToJson(point: Point) = JSONObject()
     .put("x", point.x)
@@ -32,5 +32,3 @@ object JsonWriter {
       .put("clusters", createClusterArray(clusters))
 
     Files.write(Paths.get(outfile), result.toString.getBytes(StandardCharsets.UTF_8))
-
-}
