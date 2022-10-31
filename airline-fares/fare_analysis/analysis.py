@@ -95,7 +95,7 @@ def preprocess_df(df):
     dateDiff = []
     for search, flight in zip(df['searchDate'], df['flightDate']):
         dt = flight - search
-        dateDiff = dt.days
+        dateDiff.append(dt.days)
     df['dateDiff'] = dateDiff
 
 
@@ -165,14 +165,17 @@ def most_desired_route(df, limit, airport_data):
 
 
 def correlation_price_date(df, travel_class, airlines=None):
-    classes = [
-            f'{travel_class}',
-            f'{travel_class}||{travel_class}',
-            f'{travel_class}||{travel_class}||{travel_class}',
-            f'{travel_class}||{travel_class}||{travel_class}||{travel_class}',
-            ]
 
-    filtered = df[df['segmentsCabinCode'].isin(classes)].copy()
+    def filter_by_class(series):
+        def filter_one(record):
+            return all(map(lambda x: x == travel_class, record.split('||')))
+        return series.apply(filter_one)
+
+    filtered = df.copy()
+    filtered = df[filter_by_class(df['segmentsCabinCode'])]
+    filtered = df[df['dateDiff'].notna()]
+    filtered = df[df['totalFare'].notna()]
+
     filtered['dateDiff'] = 365 - filtered['dateDiff']
 
     if airlines:
@@ -182,6 +185,8 @@ def correlation_price_date(df, travel_class, airlines=None):
             return series.apply(filter_one)
         filtered = filtered[filter_by_airline(filtered['segmentsAirlineCode'])]
 
+    print(filtered.head())
+
     corr = filtered['totalFare'].corr(filtered['dateDiff'])
 
     res_str = f'Correlation for travel class {travel_class}'
@@ -190,6 +195,11 @@ def correlation_price_date(df, travel_class, airlines=None):
     res_str += f': {corr}'
 
     print(res_str)
+
+
+def scraped_more_than_day_before(df):
+    count = sum(map(lambda x: x > 1, df['dateDiff']))
+    print(f'#deals scraped more than one day before day of flight: {count}')
 
 
 def process():
@@ -203,7 +213,6 @@ def process():
     airlines = extract_airlines(df)
 
     preprocess_df(df)
-    df.head()
 
     airlines_flying_together(df)
     ap = most_frequented_airports(df, 10, airports)[:5]
@@ -217,3 +226,4 @@ def process():
     correlation_price_date(df, 'coach', airlines.keys() - ['DL', 'AA', 'UA'])
     correlation_price_date(df, 'business',
                            airlines.keys() - ['DL', 'AA', 'UA'])
+    scraped_more_than_day_before(df)
