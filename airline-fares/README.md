@@ -165,3 +165,42 @@ profits.
 Correlation for travel class business and airlines {'AA', 'DL', 'UA'}: 0.35718535300323284
 Correlation for travel class business and airlines {'F9', 'B6', 'NK', 'SY'}: -0.38931697477626526
 ```
+
+But correlation is but a single real number and thus is incapable of providing us with
+an accurate insight into the pricing of flight tickets.
+
+We split the data into buckets by the difference between the date the offer was scraped
+and the day of the flight. What buckets were chosen can be seen in the following table.
+Ranges are inclusive.
+
+|bucket number|0|1|2|3|4|5|6|7|
+|-|-|-|-|-|-|-|-|-|
+|days before day of flight|0-1|2-3|4-7|8-14|15-21|22-31|31-61|62-|
+
+First, let's take a look at economy class flights.
+
+![Traditional carriers](./plots/buckets_coach_DL_AA_UA.png)
+
+![Low cost carriers](./plots/buckets_coach_B6_NK_SY_F9.png)
+
+We can see that the, for both types of carriers, the price gradually increases the closer
+we get to the day of the flight, however, the increase in price is quite small. The increase
+in price is more notable for LCCs, though that can be explained by the fact that LCCs tend
+to price their tickets lower and thus there's more room for growth.
+
+A rather curious thing is that the prices do not seem to differ all that much among
+LCCs and major traditional carriers, at least in economy.
+
+![Traditional carriers](./plots/buckets_business_DL_AA_UA.png)
+
+![Low cost carriers](./plots/buckets_business_B6_NK_SY_F9.png)
+
+Unlike coach, business class looks a bit more interesting. As we can see from the boxplots,
+LCCs keep gradually decreasing the cost of business class tickets as they become more and
+more desperate to sell out the entire aircraft.
+
+As was hinted at earlier, traditional major carriers price their business class tickets
+reasonably if purchased ahead. The closer we get to the day of the flight, the higher the
+cost becomes, to get as much money out of businesses as possible. Only the very last day
+before the flight do the prices drop dramatically, to try and convince impulsive buyers
+or people looking to upgrade to a higher travel class.

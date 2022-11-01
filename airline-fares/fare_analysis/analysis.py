@@ -2,6 +2,8 @@ import csv
 from datetime import datetime
 
 import pandas
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from airport import Airport
 
@@ -113,6 +115,8 @@ def preprocess_df(df):
         dateDiff.append(dt.days)
     df['dateDiff'] = dateDiff
 
+    assign_buckets(df)
+
 
 def most_frequented_airports(df, limit, airport_data):
     destination = df['destinationAirport']
@@ -220,6 +224,22 @@ def scraped_more_than_day_before(df):
     print(f'#deals scraped more than one day before day of flight: {count}')
 
 
+ticket_price_buckets = [
+            range(2), range(2, 4), range(4, 8), range(8, 15), range(15, 22),
+            range(22, 31), range(31, 62), range(62, 367),
+            ]
+
+
+def assign_buckets(df):
+    def assign_one(diff):
+        for i, b in enumerate(ticket_price_buckets):
+            if diff in b:
+                return i
+        raise RuntimeError('Delta outside of bucket range')
+
+    df['dateDiffBucket'] = df['dateDiff'].apply(assign_one)
+
+
 def ticket_price_by_bucket(df, travel_class, airlines):
 
     filtered = df.copy()
@@ -228,11 +248,14 @@ def ticket_price_by_bucket(df, travel_class, airlines):
     filtered = filtered[filtered['dateDiff'].notna()]
     filtered = filtered[filtered['totalFare'].notna()]
 
-    filtered['dateDiff'] = 365 - filtered['dateDiff']
-
     if airlines:
         filtered = filtered[filter_by_airline(filtered['segmentsAirlineCode'],
                                               airlines)]
+
+    plt.figure()
+    sns.boxplot(data=filtered, y='totalFare', x='dateDiffBucket') \
+        .set(title=f'{travel_class} ({", ".join(airlines)})')
+    plt.savefig(f'plots/buckets_{travel_class}_{"_".join(airlines)}.png')
 
 
 def process():
@@ -255,13 +278,13 @@ def process():
 
     correlation_price_date(df, 'coach')
     correlation_price_date(df, 'business')
-    correlation_price_date(df, 'coach', {'DL', 'AA', 'UA'})
-    correlation_price_date(df, 'business', {'DL', 'AA', 'UA'})
-    correlation_price_date(df, 'coach', {'B6', 'NK', 'SY', 'F9'})
-    correlation_price_date(df, 'business', {'B6', 'NK', 'SY', 'F9'})
+    correlation_price_date(df, 'coach', ['DL', 'AA', 'UA'])
+    correlation_price_date(df, 'business', ['DL', 'AA', 'UA'])
+    correlation_price_date(df, 'coach', ['B6', 'NK', 'SY', 'F9'])
+    correlation_price_date(df, 'business', ['B6', 'NK', 'SY', 'F9'])
     scraped_more_than_day_before(df)
 
-    ticket_price_by_bucket(df, 'coach', {'DL', 'AA', 'UA'})
-    ticket_price_by_bucket(df, 'business', {'DL', 'AA', 'UA'})
-    ticket_price_by_bucket(df, 'coach', {'B6', 'NK', 'SY', 'F9'})
-    ticket_price_by_bucket(df, 'business', {'B6', 'NK', 'SY', 'F9'})
+    ticket_price_by_bucket(df, 'coach', ['DL', 'AA', 'UA'])
+    ticket_price_by_bucket(df, 'business', ['DL', 'AA', 'UA'])
+    ticket_price_by_bucket(df, 'coach', ['B6', 'NK', 'SY', 'F9'])
+    ticket_price_by_bucket(df, 'business', ['B6', 'NK', 'SY', 'F9'])
