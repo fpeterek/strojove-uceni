@@ -277,6 +277,71 @@ def ticket_price_by_dow(df, travel_class, airlines):
     plt.savefig(f'plots/dow_{travel_class}_{"_".join(airlines)}.png')
 
 
+empty_seats_buckets = [
+        range(2), range(2, 5), range(5, 10), range(10, 20), range(20, 1000),
+        ]
+
+
+def ticket_price_by_empty_seats(df, travel_class, airlines):
+    filtered = df.copy()
+    filtered = filtered[filter_by_class(filtered['segmentsCabinCode'],
+                                        travel_class)]
+    filtered = filtered[filtered['dateDiff'].notna()]
+    filtered = filtered[filtered['totalFare'].notna()]
+
+    if airlines:
+        filtered = filtered[filter_by_airline(filtered['segmentsAirlineCode'],
+                                              airlines)]
+
+    def assign_one(seats):
+        for i, b in enumerate(empty_seats_buckets):
+            if seats in b:
+                return i
+        raise RuntimeError('Num of empty seats outside of bucket range')
+
+    filtered['emptySeatsBucket'] = filtered['seatsRemaining'].apply(assign_one)
+
+    plt.figure()
+    sns.boxplot(data=filtered, y='totalFare', x='emptySeatsBucket') \
+        .set(title=f'{travel_class} ({", ".join(airlines)})')
+    file = f'plots/seatsRemaining_{travel_class}_{"_".join(airlines)}.png'
+    plt.savefig(file)
+
+
+def offers_by_date_diff(df, travel_class):
+    filtered = df.copy()
+    filtered = filtered[filter_by_class(filtered['segmentsCabinCode'],
+                                        travel_class)]
+    filtered = filtered[filtered['dateDiff'].notna()]
+    filtered = filtered[filtered['totalFare'].notna()]
+
+    def carriers_to_type(airlines):
+        split = airlines.split('||')
+
+        tc = {'AA', 'DL', 'UA'}
+        lc = {'B6', 'NK', 'SY', 'F9'}
+        trad = all(map(lambda x: x in tc, split))
+        lcc = all(map(lambda x: x in lc, split))
+
+        if trad:
+            return 'traditional'
+        elif lcc:
+            return 'lcc'
+        else:
+            return 'ignore'
+
+    filtered['carrierType'] = filtered['segmentsAirlineCode'] \
+        .apply(carriers_to_type)
+
+    filtered = filtered[filtered['carrierType'] != 'ignore']
+
+    plt.figure()
+    sns.boxplot(data=filtered, y='dateDiff', x='carrierType') \
+        .set(title=f'{travel_class}')
+    file = f'plots/offers_by_date_diff_{travel_class}.png'
+    plt.savefig(file)
+
+
 def process():
     print('Loading dataset...')
     df = load_df('data/sample.csv')
@@ -312,3 +377,11 @@ def process():
     ticket_price_by_dow(df, 'business', ['DL', 'AA', 'UA'])
     ticket_price_by_dow(df, 'coach', ['B6', 'NK', 'SY', 'F9'])
     ticket_price_by_dow(df, 'business', ['B6', 'NK', 'SY', 'F9'])
+
+    ticket_price_by_empty_seats(df, 'coach', ['DL', 'AA', 'UA'])
+    ticket_price_by_empty_seats(df, 'business', ['DL', 'AA', 'UA'])
+    ticket_price_by_empty_seats(df, 'coach', ['B6', 'NK', 'SY', 'F9'])
+    ticket_price_by_empty_seats(df, 'business', ['B6', 'NK', 'SY', 'F9'])
+
+    offers_by_date_diff(df, 'coach')
+    offers_by_date_diff(df, 'business')

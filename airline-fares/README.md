@@ -237,5 +237,10 @@ on a business trip).
 The disparity in pricing between LCCs and traditional carriers is, yet again, caused by
 a difference between clientele.
 
+## Do tickets get more expensive as the plane gets more and more full
 
+## Do tickets for LCCs get sold out earlier
 
+It must be noted that we do not know the day the ticket, if ever, was sold. However, we can
+make an assumption that if certain tickets are desired, they will get sold out earlier, and
+thus there will be fewer last minute deals for such flights.
