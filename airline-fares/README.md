@@ -22,6 +22,13 @@ catching their connecting flight, if they get stuck in airport queues. Thus, we 
 that passengers need to be wary of what trips Expedia tries to sell to them and ensure they
 always have enough time to catch their connecting flights.
 
+It is also noteworthy that the only airlines that do not appear in multi-segment flights with
+other airlines are ultra low cost carriers -- Frontier Airlines (IATA `F9`), Spirit Airlines
+(IATA `NK`), and Sun Country Airlines (IATA `SY`). LCCs do not offer multisegment flights
+as it incurrs additional costs upon them (i.e. having to take care of passengers in case
+of a delay) and they operate their flights at ridiculous times when the airport fees are
+the lowest, making it difficult to find a reasonable connecting flight.
+
 |airline|shares flights with|
 |-------|-------------------|
 |AA|9X, 9K, UA, B6, 4B, LF, KG|
@@ -108,3 +115,53 @@ New York.
 |LAX-JFK|14164|
 |SFO-LAX|13853|
 |ORD-BOS|13166|
+
+## Does the date of purchase affect ticket prices
+
+First, we want to compute the difference between the day of the flight and the day the
+offer was scraped (a possible date of purchase). Then, we may wish to invert this number
+so that the closer to the day of the flight we buy the ticket, the higher this
+invented metric is. Airlines generally do not sell tickets more than a year in advance,
+thus, we can just subtract the difference in days from 365 to get our desired metric.
+We use the inverted metric to get a positive correlation if the price grows the closer
+the date of purchase is to the date of the actual flight, and vice versa, making the
+results more intuitive.
+
+The first thing we notice is that there is next to no correlation if take into account
+all the airlines in our dataset.
+
+```
+Correlation for travel class coach: 0.05902518247859265
+Correlation for travel class business: -0.09744523681248259
+```
+
+However, the results change if only look at the three major US airlines and low cost
+carriers separately.
+
+Looking at economy class, the correlation is still slight at best.
+
+```
+Correlation for travel class coach and airlines {'AA', 'DL', 'UA'}: 0.0502795446206922
+Correlation for travel class coach and airlines {'F9', 'B6', 'NK', 'SY'}: 0.12782560251368322
+```
+
+Analyzing business class finally yields interesting results. The closer we get to the date
+of the flight, the higher the ticket prices are for traditional major carriers, yet, the
+prices of LCCs decrease the closer the date of the flight is.
+
+A possible explanation would be that the main clientele of traditional major carriers are
+businesses. Businesses tend to buy tickets close to the date of the flight -- offline meetings
+are seldom arranged a year in advance, and since business buy flight tickets to make money,
+they do not mind investing in the flight tickets they desperately need. Another possible target
+group for traditional carriers providing a luxurious or premium product would be impulsive or
+busy rich people.
+
+Low cost carriers are more focused on budget conscious tourists who tend to buy tickets a long
+time in advance. Therefore, they are forced to decrease their prices if the aircraft isn't fully
+sold out yet to ensure the aircraft takes off completely full and the airline maximizes its
+profits.
+
+```
+Correlation for travel class business and airlines {'AA', 'DL', 'UA'}: 0.35718535300323284
+Correlation for travel class business and airlines {'F9', 'B6', 'NK', 'SY'}: -0.38931697477626526
+```
