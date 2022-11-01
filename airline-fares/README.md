@@ -204,3 +204,38 @@ reasonably if purchased ahead. The closer we get to the day of the flight, the h
 cost becomes, to get as much money out of businesses as possible. Only the very last day
 before the flight do the prices drop dramatically, to try and convince impulsive buyers
 or people looking to upgrade to a higher travel class.
+
+## Does the day of week of the flight affect ticket price
+
+First, let's have a look at economy class.
+
+The plot displays the relation between ticket price and day of week. Days of week start
+with Monday (=0) and end with Sunday (=6).
+
+![Traditional carriers](./plots/dow_coach_DL_AA_UA.png)
+
+![Low cost carriers](./plots/dow_coach_B6_NK_SY_F9.png)
+
+As we can see, the prices remain consistent throughout the entire week.
+
+However, things seem to change in business class.
+
+![Traditional carriers](./plots/dow_business_DL_AA_UA.png)
+
+![Low cost carriers](./plots/dow_business_B6_NK_SY_F9.png)
+
+If we look at LCCs, despite the fact that the prices are skewed differently on different
+days of the week, the median price remains consistent.
+
+However, that is not the case for traditional carriers. According to the plot, the median ticket
+price seems to drop drastically on Tuesday, remains low until Thursday, and only goes back up
+on Fridays. Why? A possible answer would be that businesspeople fly out on Mondays and return
+on Fridays to get back home for the weekend. Weekends are then reserved for leisurely travel
+of affluent people. Fewer people fly during the midweek (as they're either at work or already
+on a business trip).
+
+The disparity in pricing between LCCs and traditional carriers is, yet again, caused by
+a difference between clientele.
+
+
+

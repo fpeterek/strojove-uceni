@@ -258,6 +258,25 @@ def ticket_price_by_bucket(df, travel_class, airlines):
     plt.savefig(f'plots/buckets_{travel_class}_{"_".join(airlines)}.png')
 
 
+def ticket_price_by_dow(df, travel_class, airlines):
+    filtered = df.copy()
+    filtered = filtered[filter_by_class(filtered['segmentsCabinCode'],
+                                        travel_class)]
+    filtered = filtered[filtered['dateDiff'].notna()]
+    filtered = filtered[filtered['totalFare'].notna()]
+
+    if airlines:
+        filtered = filtered[filter_by_airline(filtered['segmentsAirlineCode'],
+                                              airlines)]
+
+    filtered['dow'] = filtered['flightDate'].apply(lambda x: x.weekday())
+
+    plt.figure()
+    sns.boxplot(data=filtered, y='totalFare', x='dow') \
+        .set(title=f'{travel_class} ({", ".join(airlines)})')
+    plt.savefig(f'plots/dow_{travel_class}_{"_".join(airlines)}.png')
+
+
 def process():
     print('Loading dataset...')
     df = load_df('data/sample.csv')
@@ -288,3 +307,8 @@ def process():
     ticket_price_by_bucket(df, 'business', ['DL', 'AA', 'UA'])
     ticket_price_by_bucket(df, 'coach', ['B6', 'NK', 'SY', 'F9'])
     ticket_price_by_bucket(df, 'business', ['B6', 'NK', 'SY', 'F9'])
+
+    ticket_price_by_dow(df, 'coach', ['DL', 'AA', 'UA'])
+    ticket_price_by_dow(df, 'business', ['DL', 'AA', 'UA'])
+    ticket_price_by_dow(df, 'coach', ['B6', 'NK', 'SY', 'F9'])
+    ticket_price_by_dow(df, 'business', ['B6', 'NK', 'SY', 'F9'])
