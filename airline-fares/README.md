@@ -308,3 +308,55 @@ as tourists, while traditional carrier business class is used by business or aff
 who value flexibility over money.
 
 ## Most favored aircraft manufacturer/aircraft
+
+|manufacturer|count|
+|------------|-----|
+|Airbus|385261|
+|Embraer|154672|
+|Boeing|366762|
+|Crj|61005|
+|Tecnam|2350|
+|Dehavilland|1291|
+|Pilatus|1345|
+|Fairchild|470|
+|Atr|7|
+
+|model|count|
+|------------|-----|
+|Airbus A320|367909|
+|Embraer 175|121960|
+|Boeing 737|299612|
+|Embraer 190|22346|
+|CRJ 900|51330|
+|Boeing 717|20292|
+|Embraer 145|10366|
+|Boeing 757|32118|
+|CRJ 700|9675|
+|Airbus A220|16529|
+|Tecnam p2012|2350|
+|Airbus A330|457|
+|Boeing 787|2717|
+|Boeing 777|10794|
+|Dehavilland DHC-8|1291|
+|Pilatus PC-12|1345|
+|Fairchild Dornier 238|470|
+|Airbus A350|366|
+|Boeing 767|1229|
+|ATR 42|3|
+|ATR 72|4|
+
+## Does price per mile vary based on total distance
+
+![Traditional carriers](./plots/price_per_mile_coach_DL_AA_UA.png)
+
+![Low cost carriers](./plots/price_per_mile_coach_B6_NK_SY_F9.png)
+
+![Traditional carriers](./plots/price_per_mile_business_DL_AA_UA.png)
+
+![Low cost carriers](./plots/price_per_mile_business_B6_NK_SY_F9.png)
+
+## Is business class priced differently on wide-bodies
+
+Economy is the same on narrow bodies and wide bodies. Business class can differ
+because wide-bodies are used for long haul flights and thus it's more desirable
+for airlines to provide a better product.

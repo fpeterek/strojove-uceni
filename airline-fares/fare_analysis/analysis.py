@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 from airport import Airport
+from flight import Flight
+from aircraft import Aircraft
 
 
 def parse_date(date: str):
@@ -108,6 +110,8 @@ def preprocess_df(df):
                      ])
     df['searchDate'] = df['searchDate'].apply(parse_date)
     df['flightDate'] = df['flightDate'].apply(parse_date)
+    df['segmentsEquipmentDescription'] = \
+        df['segmentsEquipmentDescription'].astype(str)
 
     dateDiff = []
     for search, flight in zip(df['searchDate'], df['flightDate']):
@@ -342,6 +346,170 @@ def offers_by_date_diff(df, travel_class):
     plt.savefig(file)
 
 
+def parse_aircraft(equipment: str):
+    equipment = equipment.lower()
+
+    manufacturer = ''
+    model = ''
+
+    if not equipment:
+        return None
+
+    if 'airbus' in equipment:
+        manufacturer = 'Airbus'
+        if 'a220' in equipment:
+            model = 'A220'
+        elif 'a300' in equipment:
+            model = 'A300'
+        elif 'a310' in equipment:
+            model = 'A310'
+        elif 'a330' in equipment:
+            model = 'A330'
+        elif 'a340' in equipment:
+            model = 'A340'
+        elif 'a350' in equipment:
+            model = 'A350'
+        elif 'a380' in equipment:
+            model = 'A380'
+        elif 'a318' in equipment or 'a319' in equipment or 'a32' in equipment:
+            model = 'A320'
+        else:
+            raise RuntimeError(f'Unexpected aircraft{equipment}')
+    elif 'boeing' in equipment:
+        manufacturer = 'Boeing'
+        if '707' in equipment:
+            model = '707'
+        elif '717' in equipment:
+            model = '717'
+        elif '727' in equipment:
+            model = '727'
+        elif '737' in equipment:
+            model = '737'
+        elif '747' in equipment:
+            model = '747'
+        elif '757' in equipment:
+            model = '757'
+        elif '767' in equipment:
+            model = '767'
+        elif '777' in equipment:
+            model = '777'
+        elif '787' in equipment:
+            model = '787'
+        else:
+            raise RuntimeError(f'Unexpected aircraft{equipment}')
+    elif 'embraer' in equipment:
+        manufacturer = 'Embraer'
+        if '175' in equipment or '170' in equipment:
+            model = '175'
+        elif '190' in equipment or '195' in equipment:
+            model = '190'
+        elif '145' in equipment:
+            model = '145'
+        else:
+            raise RuntimeError(f'Unexpected aircraft{equipment}')
+    elif 'canadair' in equipment or 'canadian' in equipment:
+        manufacturer = 'CRJ'
+        model = '900'
+        if '700' in equipment:
+            model = '700'
+    # Unfortunately, we do not know which Cessna we're flying, thus we can only
+    # choose to ignore it
+    elif 'metro' in equipment or 'bus' in equipment or 'varies' in equipment \
+            or equipment == 'nan' or equipment == 'cessna':
+        return None
+    elif 'tecnam' in equipment:
+        manufacturer = 'Tecnam'
+        model = 'p2012'
+    elif 'pilatus' in equipment:
+        manufacturer = 'Pilatus'
+        model = 'PC-12'
+    elif 'dehavilland' in equipment:
+        manufacturer = 'Dehavilland'
+        model = 'DHC-8'
+    elif 'fairchild' in equipment:
+        manufacturer = 'Fairchild'
+        model = 'Dornier 238'
+    elif 'atr' in equipment:
+        manufacturer = 'ATR'
+        model = '42' if '42' in equipment else '72'
+    else:
+        raise RuntimeError(f'Unexpected aircraft {equipment}')
+
+    return Aircraft(manufacturer, model)
+
+
+def extract_flights(df):
+    flights = set()
+
+    for _, row in df.iterrows():
+
+        times = row['segmentsDepartureTimeEpochSeconds'].split('||')
+        airports = [row['startingAirport']] + \
+            row['segmentsArrivalAirportCode'].split('||')
+        airlines = row['segmentsAirlineCode'].split('||')
+        equipment = row['segmentsEquipmentDescription'].split('||')
+
+        for i in range(len(airports) - 1):
+            f = Flight(
+                    time=times[i],
+                    origin=airports[i],
+                    destination=airports[i+1],
+                    airline=airlines[i],
+                    aircraft=parse_aircraft(equipment[i]),
+                    )
+            if f.aircraft:
+                flights.add(f)
+
+    return flights
+
+
+def aircraft_stats(flights: list[Flight]):
+
+    manufacturers = dict()
+    models = dict()
+
+    for flight in flights:
+        m = flight.aircraft.manufacturer.capitalize()
+        model = str(flight.aircraft)
+        manufacturers[m] = manufacturers.get(m, 0) + 1
+        models[model] = models.get(model, 0) + 1
+
+    print('|manufacturer|count|')
+    print('|------------|-----|')
+    for manufacturer, count in manufacturers.items():
+        print(f'|{manufacturer}|{count}|')
+
+    print('|model|count|')
+    print('|------------|-----|')
+    for model, count in models.items():
+        print(f'|{model}|{count}|')
+
+
+def price_per_mile(df, travel_class, airlines):
+    filtered = df.copy()
+    filtered = filtered[filtered['isNonStop']]
+    filtered = filtered[filtered['totalTravelDistance'].notna()]
+    filtered = filtered[filter_by_class(filtered['segmentsCabinCode'],
+                                        travel_class)]
+    filtered = filtered[filtered['totalFare'].notna()]
+
+    if airlines:
+        filtered = filtered[filter_by_airline(filtered['segmentsAirlineCode'],
+                                              airlines)]
+
+    filtered['ppm'] = filtered['totalFare'] / filtered['totalTravelDistance']
+
+    corr = filtered['ppm'].corr(filtered['totalTravelDistance'])
+    print('Correlation between travel distance and price per mile',
+          f'for class {travel_class} and airlines {airlines}: {corr}')
+
+    plt.figure()
+    plt.scatter(y=filtered['ppm'], x=filtered['totalTravelDistance'])
+    plt.title(f'{travel_class} ({", ".join(airlines)})')
+    file = f'plots/price_per_mile_{travel_class}_{"_".join(airlines)}.png'
+    plt.savefig(file)
+
+
 def process():
     print('Loading dataset...')
     df = load_df('data/sample.csv')
@@ -350,7 +518,7 @@ def process():
     airports = load_airports('data/airport-codes_csv.csv')
 
     print('Preprocessing dataset...')
-    airlines = extract_airlines(df)
+    # airlines = extract_airlines(df)
 
     preprocess_df(df)
 
@@ -385,3 +553,11 @@ def process():
 
     offers_by_date_diff(df, 'coach')
     offers_by_date_diff(df, 'business')
+
+    flights = extract_flights(df)
+    aircraft_stats(flights)
+
+    price_per_mile(df, 'coach', ['DL', 'AA', 'UA'])
+    price_per_mile(df, 'business', ['DL', 'AA', 'UA'])
+    price_per_mile(df, 'coach', ['B6', 'NK', 'SY', 'F9'])
+    price_per_mile(df, 'business', ['B6', 'NK', 'SY', 'F9'])
