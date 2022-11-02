@@ -309,41 +309,66 @@ who value flexibility over money.
 
 ## Most favored aircraft manufacturer/aircraft
 
+To perform this analysis, we must first try to perform deduplication of flights. Flights
+are hashed by their time of departure, origin and destination airports, flight operator
+and aircraft. We want to ensure no flight is counted multiple times in case there are
+multiple offers for one flight in the dataset.
+
+Except for very special flights, such as first flight of an aircraft of a certain type
+or exhibition flights, tickets aren't usually sold out by how desirable the flight is.
+Since the dataset only contains flights across the contiguous US, we can assume the
+aircraft with the most offers available are also among the most used aircraft in the US,
+as the dataset only includes short-haul flights. If the dataset also included long-haul
+flights, we would have to compute the flight distance of each aircraft type, as, intuitively,
+aircraft flying long distance flights tend to operate fewer flights and yet cover more
+distance than aircraft on short haul flights.
+
 |manufacturer|count|
 |------------|-----|
 |Airbus|385261|
-|Embraer|154672|
 |Boeing|366762|
-|Crj|61005|
+|Embraer|154672|
+|CRJ|61005|
 |Tecnam|2350|
-|Dehavilland|1291|
 |Pilatus|1345|
+|Dehavilland|1291|
 |Fairchild|470|
-|Atr|7|
+|ATR|7|
+
+Perhaps a bit surprisingly, Airbus has managed to take the lead as the preferred manufacturer.
+The US is a home to Boeing, and, in the past, the Boeing 737 used to be the most widespread
+passenger aircraft. However, very recently, partly also due to the MAX-8 fiasco, the
+Airbus A320 has managed to overtake the B737 in the total number of orders.
+
+Even by adding the three narrow-bodies built by Boeing and present in the list, we end up
+10000 flights short of the Airbus A320, and that does not include the A220, which is also
+becoming increasingly more popular (and that Boeing has no answer for).
+
+However, Boeing wide-bodies are a lot more popular than Airbus wide-bodies.
 
 |model|count|
 |------------|-----|
 |Airbus A320|367909|
-|Embraer 175|121960|
 |Boeing 737|299612|
-|Embraer 190|22346|
+|Embraer 175|121960|
 |CRJ 900|51330|
-|Boeing 717|20292|
-|Embraer 145|10366|
 |Boeing 757|32118|
-|CRJ 700|9675|
+|Embraer 190|22346|
+|Boeing 717|20292|
 |Airbus A220|16529|
-|Tecnam p2012|2350|
-|Airbus A330|457|
-|Boeing 787|2717|
 |Boeing 777|10794|
-|Dehavilland DHC-8|1291|
+|Embraer 145|10366|
+|CRJ 700|9675|
+|Boeing 787|2717|
+|Tecnam P2012|2350|
 |Pilatus PC-12|1345|
-|Fairchild Dornier 238|470|
-|Airbus A350|366|
+|Dehavilland DHC-8|1291|
 |Boeing 767|1229|
-|ATR 42|3|
+|Fairchild Dornier 238|470|
+|Airbus A330|457|
+|Airbus A350|366|
 |ATR 72|4|
+|ATR 42|3|
 
 ## Does price per mile vary based on total distance
 
@@ -354,6 +379,17 @@ who value flexibility over money.
 ![Traditional carriers](./plots/price_per_mile_business_DL_AA_UA.png)
 
 ![Low cost carriers](./plots/price_per_mile_business_B6_NK_SY_F9.png)
+
+Price per mile of business class tickets does not tell us anything due to a lack of data.
+
+Price per mile for economy tickets seems to drop exponentially as the total distance
+increases. This result is to be expected -- on very short flights, fixed airport fees and
+taxes make up a very big portion of the fare. However, as distance increases and fuel,
+aircraft time, and wage costs become more and more pronounced, fixed fees start to make up
+a much less significant portion of the fare and price per mile decreases.
+
+We can also see that the price per mile of LCCs is notably lower than the price per mile
+of traditional carriers.
 
 ## Is business class priced differently on wide-bodies
 

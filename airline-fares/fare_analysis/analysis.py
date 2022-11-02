@@ -469,7 +469,7 @@ def aircraft_stats(flights: list[Flight]):
     models = dict()
 
     for flight in flights:
-        m = flight.aircraft.manufacturer.capitalize()
+        m = flight.aircraft.manufacturer
         model = str(flight.aircraft)
         manufacturers[m] = manufacturers.get(m, 0) + 1
         models[model] = models.get(model, 0) + 1
