@@ -239,8 +239,72 @@ a difference between clientele.
 
 ## Do tickets get more expensive as the plane gets more and more full
 
+As the number of empty seats may possibly be anywhere between 1 and 700 (although the A380
+is not used for domestic flights across the US and very few airports in the US can actually
+serve the A380), we may wish to map the amounts of empty seats to buckets, with each bucket
+representing a certain range of empty seats on the aircraft.
+
+|bucket| 0|  1|  2|    3|  4|
+|------|--|---|---|-----|---|
+|range | 1|2-4|5-9|10-19|20+|
+
+![Traditional carriers](./plots/seatsRemaining_coach_DL_AA_UA.png)
+
+![Low cost carriers](./plots/seatsRemaining_coach_B6_NK_SY_F9.png)
+
+When examining economy class, we may notice a minor upwards trend for traditional carriers
+and a slight downwards trend for LCCs. Again, this could be explained by a difference in the
+way these types of carriers work. Traditional carriers tend to offer better service for
+customers willing to pay a bit more. When the aircraft gets nearly sold out, they try to
+create a sense of urgency and sell more expensive tickets to customers willing to pay a tiny
+premium. Traditional carriers are used to flying with a non-sold out aircraft. LCCs on the
+other hand need to sell out the entire aircraft. LCCs, unlike traditional carriers, usually
+tend to fly with their aircraft almost completely full and sell flight tickets at a loss,
+at the hopes of reclaiming the lost money by selling auxillary services such as refreshments,
+seat selection, checked-in luggage, etc. Therefore they are more likely to decrease their
+prices if the aircraft is not completely sold out.
+
+![Traditional carriers](./plots/seatsRemaining_business_DL_AA_UA.png)
+
+![Low cost carriers](./plots/seatsRemaining_business_B6_NK_SY_F9.png)
+
+We can notice a similar downwards trend when examining the pricing of business class tickets
+of LCCs.
+
+The statistics for traditional carriers, however, tell a different story. The ticket prices
+start lower as the aircraft is mostly empty. As the seats get more and more sold out, the
+ticket prices creep up, as the airline tries to create a sense of urgency and sell expensive
+tickets to people in need. However, the prices then seem to drop drastically for the very last
+available seat on the plane. Why is that? It could be because the airline are making last minute
+offers one day before the flight, but it could also be because the passenger can no longer
+choose their seat, as all the other seats have already been reserved, and the passenger is
+unlikely to sit alone or get a desirable seat.
+
 ## Do tickets for LCCs get sold out earlier
 
 It must be noted that we do not know the day the ticket, if ever, was sold. However, we can
 make an assumption that if certain tickets are desired, they will get sold out earlier, and
 thus there will be fewer last minute deals for such flights.
+
+We use the same grouping of airlines as we did earlier. Delta, United and American are
+considered as traditional major carriers, Spirit, jetBlue, Frontier and Sun Country are our
+LCCs.
+
+![Coach](./plots/offers_by_date_diff_coach.png)
+
+By looking at the graph of economy class, we can see that the statistics for both LCCs and
+traditional carriers are essentially on par.
+
+![Business](./plots/offers_by_date_diff_business.png)
+
+However, things change once we start exploring the statistics of business class tickets.
+Business class tickets of LCCs seem to be sold out earlier, while major carriers see
+more of their tickets sold closer to the day of the flight, which would explain why there
+are so many business class offers scraped closer to the date the flight takes place.
+
+The graph of LCC business class does not differ much from economy class, either. That is
+likely because LCCs and economy class are preferred by price conscious passengers such
+as tourists, while traditional carrier business class is used by business or affluent people
+who value flexibility over money.
+
+## Most favored aircraft manufacturer/aircraft

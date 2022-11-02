@@ -224,7 +224,7 @@ def scraped_more_than_day_before(df):
     print(f'#deals scraped more than one day before day of flight: {count}')
 
 
-ticket_price_buckets = [
+date_diff_buckets = [
             range(2), range(2, 4), range(4, 8), range(8, 15), range(15, 22),
             range(22, 31), range(31, 62), range(62, 367),
             ]
@@ -232,7 +232,7 @@ ticket_price_buckets = [
 
 def assign_buckets(df):
     def assign_one(diff):
-        for i, b in enumerate(ticket_price_buckets):
+        for i, b in enumerate(date_diff_buckets):
             if diff in b:
                 return i
         raise RuntimeError('Delta outside of bucket range')
