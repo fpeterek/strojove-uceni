@@ -1,6 +1,13 @@
+# Exploratory Data Analysis
+
 Data source: https://www.kaggle.com/datasets/dilwong/flightprices
 
 Airports: https://datahub.io/core/airport-codes
+
+The dataset contains flight ticket offers scraped from Expedia. Only domestic flights
+across the contiguous United States are present in this dataset. It is important to
+make note of the fact that this dataset does not contain any data on sales of flight
+tickets, only on publicly available ticket offerings.
 
 ## Do the offers include multisegment flights with airlines without a codeshare agreement?
 
@@ -372,6 +379,9 @@ However, Boeing wide-bodies are a lot more popular than Airbus wide-bodies.
 
 ## Does price per mile vary based on total distance
 
+We are only analyzing direct flights to filter out the effect of connections
+on ticket pricing.
+
 ![Traditional carriers](./plots/price_per_mile_coach_DL_AA_UA.png)
 
 ![Low cost carriers](./plots/price_per_mile_coach_B6_NK_SY_F9.png)
@@ -395,4 +405,28 @@ of traditional carriers.
 
 Economy is the same on narrow bodies and wide bodies. Business class can differ
 because wide-bodies are used for long haul flights and thus it's more desirable
-for airlines to provide a better product.
+for airlines to provide a better product. The question is, does the price
+of business class tickets correlate with the number of aisles?
+
+Yet again, we want to split the tickets into multiple buckets, this time by travel
+distance, to ensure we are comparing fares for similar flights.
+
+|bucket|4|5|
+|------|-|-|
+|distance|2000-2500|2500-3000|
+
+![widebody](./plots/widebody.png)
+
+![narrowbody](./plots/narrowbody.png)
+
+The result is rather surprising. Even though we may expect a better product on wide-body
+aircraft, the tickets seem to be priced lower. One possible explanation is that there are way
+too many business class seats to fill on a domestic flight, that the airlines have to
+price the tickets lower to make sure they sell a sufficient amount of business class tickets.
+
+Another possible explanation is that widebodies are used on more desired routes -- and airlines
+will likely face higher competition on such routes, therefore they have to lower their prices
+to stay competetive, whereas on more niche routes where there is less competition, and where
+narrowbody aircraft would be used, people are happy to find any flight and are more willing
+to shell out a higher sum of money.
+

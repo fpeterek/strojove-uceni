@@ -506,7 +506,68 @@ def price_per_mile(df, travel_class, airlines):
     plt.figure()
     plt.scatter(y=filtered['ppm'], x=filtered['totalTravelDistance'])
     plt.title(f'{travel_class} ({", ".join(airlines)})')
+
+    plt.xlabel('Travel Distance')
+    plt.ylabel('Price Per Mile')
+
     file = f'plots/price_per_mile_{travel_class}_{"_".join(airlines)}.png'
+    plt.savefig(file)
+
+
+def wide_or_narrow(df):
+    filtered = df.copy()
+    filtered = filtered[filtered['isNonStop']]
+    filtered = filtered[filtered['totalTravelDistance'].notna()]
+    filtered = filtered[filter_by_class(filtered['segmentsCabinCode'],
+                                        'business')]
+    filtered = filtered[filtered['totalFare'].notna()]
+
+    filtered = filtered[filter_by_airline(filtered['segmentsAirlineCode'],
+                                          ['DL', 'AA', 'UA'])]
+
+    travel_distance_buckets = [
+            range(500), range(500, 1000), range(1000, 1500), range(1500, 2000),
+            range(2000, 2500), range(2500, 3000)]
+
+    def assign(seats):
+        for i, b in enumerate(travel_distance_buckets):
+            if seats in b:
+                return i
+        raise RuntimeError('Travel distance outside of bucket range')
+
+    filtered['distanceBucket'] = filtered['totalTravelDistance'].apply(assign)
+
+    def ac_type(aircraft):
+        aircraft = aircraft.lower()
+        if 'boeing' in aircraft:
+            if '777' in aircraft or '767' in aircraft or '787' in aircraft:
+                return 'widebody'
+            return 'narrowbody'
+        if 'airbus' in aircraft:
+            if '350' in aircraft or '330' in aircraft or '340' in aircraft:
+                return 'widebody'
+            return 'narrowbody'
+        return 'ignore'
+
+    filtered['body_type'] = filtered['segmentsEquipmentDescription'] \
+        .apply(ac_type)
+
+    widebody = filtered[filtered['body_type'] == 'widebody']
+    narrowbody = filtered[filtered['body_type'] == 'narrowbody']
+
+    print(widebody.shape)
+    print(narrowbody.shape)
+
+    plt.figure()
+    sns.boxplot(data=widebody, y='totalFare', x='distanceBucket') \
+        .set(title='Widebody')
+    file = 'plots/widebody.png'
+    plt.savefig(file)
+
+    plt.figure()
+    sns.boxplot(data=narrowbody, y='totalFare', x='distanceBucket') \
+        .set(title='Narrowbody')
+    file = 'plots/narrowbody.png'
     plt.savefig(file)
 
 
@@ -561,3 +622,5 @@ def process():
     price_per_mile(df, 'business', ['DL', 'AA', 'UA'])
     price_per_mile(df, 'coach', ['B6', 'NK', 'SY', 'F9'])
     price_per_mile(df, 'business', ['B6', 'NK', 'SY', 'F9'])
+
+    wide_or_narrow(df)
