@@ -57,19 +57,19 @@ the lowest, making it difficult to find a reasonable connecting flight.
 ## Most frequented airports
 
 Rather surprisingly, the most visited airport in trips sold by Expedia is LAX. This statistic
-does not reflect the entire air travel situation in the US. In reality, ATL is the most is the
+does not reflect the entire air travel situation in the US. In reality, ATL is the
 most frequented airport in the US,
 [surpassing LAX by almost 30 milion pax/year](https://www.aerotime.aero/articles/31886-top-10-biggest-airports-in-the-world-2021).
 
-ORD, DEN and DFW are in reality also bigger than LAX.
+ORD, DEN and DFW are in reality also bigger than LAX in terms of passenger traffic.
 
 The obvious explanation would then be that Expedia is only focused on leisurely travel
 and Los Angeles is a big tourist destination.
 
 It must be noted that the data is a collection of offers scraped from Expedia, not a collection
 of trips that were actually sold. Thus, we must take this data with a grain of salt, although we
-can at the very least assume the airlines are not operating empty flights. A lot of resources
-is spent on optimizing routes served by airlines, and therefore we can assume the airports with
+can at the very least assume the airlines are not operating empty flights. Many resources
+are spent on optimizing routes served by airlines, and therefore we can assume the airports with
 the most offers available are also the most desired destinations among holiday-goers.
 
 |Airport|Airport name|Number of visits|
@@ -106,7 +106,7 @@ destination, meaning it is a destination favored by US citizens going on holiday
 
 ## Most frequent trip
 
-The two most offered routes on Expedia is a trip from Chicago to New York and vice versa.
+The two most offered routes on Expedia are a trip from Chicago to New York and vice versa.
 Only the third most offered trip is a trip to LA, more specifically a trip departing from
 New York.
 
@@ -126,7 +126,7 @@ New York.
 ## Does the date of purchase affect ticket prices
 
 First, we want to compute the difference between the day of the flight and the day the
-offer was scraped (a possible date of purchase). Then, we may wish to invert this number
+offer was scraped (a potential date of purchase). Then, we may wish to invert this number
 so that the closer to the day of the flight we buy the ticket, the higher this
 invented metric is. Airlines generally do not sell tickets more than a year in advance,
 thus, we can just subtract the difference in days from 365 to get our desired metric.
@@ -158,10 +158,10 @@ prices of LCCs decrease the closer the date of the flight is.
 
 A possible explanation would be that the main clientele of traditional major carriers are
 businesses. Businesses tend to buy tickets close to the date of the flight -- offline meetings
-are seldom arranged a year in advance, and since business buy flight tickets to make money,
+are seldom arranged a year in advance, and since businesses buy flight tickets to make money,
 they do not mind investing in the flight tickets they desperately need. Another possible target
 group for traditional carriers providing a luxurious or premium product would be impulsive or
-busy rich people.
+busy affluent people who do not know ahead of time when they'll be able to travel.
 
 Low cost carriers are more focused on budget conscious tourists who tend to buy tickets a long
 time in advance. Therefore, they are forced to decrease their prices if the aircraft isn't fully
@@ -177,7 +177,7 @@ But correlation is but a single real number and thus is incapable of providing u
 an accurate insight into the pricing of flight tickets.
 
 We split the data into buckets by the difference between the date the offer was scraped
-and the day of the flight. What buckets were chosen can be seen in the following table.
+and the day of the flight. Which buckets were chosen can be seen in the following table.
 Ranges are inclusive.
 
 |bucket number|0|1|2|3|4|5|6|7|
@@ -223,7 +223,8 @@ with Monday (=0) and end with Sunday (=6).
 
 ![Low cost carriers](./plots/dow_coach_B6_NK_SY_F9.png)
 
-As we can see, the prices remain consistent throughout the entire week.
+As we can see, the prices remain mostly consistent throughout the entire week, although
+they droop down slightly on Tuesdays and Wednesdays.
 
 However, things seem to change in business class.
 
@@ -240,6 +241,9 @@ on Fridays. Why? A possible answer would be that businesspeople fly out on Monda
 on Fridays to get back home for the weekend. Weekends are then reserved for leisurely travel
 of affluent people. Fewer people fly during the midweek (as they're either at work or already
 on a business trip).
+
+The drop in price in business class is more notable than it is in coach, but the reason
+for the discount in ticket prices is the same.
 
 The disparity in pricing between LCCs and traditional carriers is, yet again, caused by
 a difference between clientele.
