@@ -124,11 +124,12 @@ main = do
         uniqueClasses = unique classes
         attributes    = map (map (if dataType == "char" then ticTacToeToFloat else readAttr)) attrCols
         numAttributes = length (head attributes)
+        attrIndices   = [0..(pred numAttributes)]
         df            = (attributes, classes, uniqueClasses)
 
     putStrLn "Dataset Loaded"
 
-    print (minimizeGini df [0..(pred numAttributes)])
+    print (minimizeGini df attrIndices)
 
     putStrLn "Shutting down"
 
