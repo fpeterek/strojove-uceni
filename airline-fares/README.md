@@ -4,10 +4,17 @@ Data source: https://www.kaggle.com/datasets/dilwong/flightprices
 
 Airports: https://datahub.io/core/airport-codes
 
+[Online version of this document.](https://github.com/fpeterek/strojove-uceni/tree/master/airline-fares#readme)
+
 The dataset contains flight ticket offers scraped from Expedia. Only domestic flights
 across the contiguous United States are present in this dataset. It is important to
 make note of the fact that this dataset does not contain any data on sales of flight
 tickets, only on publicly available ticket offerings.
+
+The dataset contains multisegment flights. Whenever flights are analyzed by a certain
+criteria, only flights where all legs meet the criteria are considered. I.e. if we're
+analyzing economy class of low cost carriers (LCCs), all legs of the flight must be
+operated by an LCC and the travel class for each leg must be economy.
 
 ## Do the offers include multisegment flights with airlines without a codeshare agreement?
 
@@ -68,8 +75,8 @@ and Los Angeles is a big tourist destination.
 
 It must be noted that the data is a collection of offers scraped from Expedia, not a collection
 of trips that were actually sold. Thus, we must take this data with a grain of salt, although we
-can at the very least assume the airlines are not operating empty flights. Many resources
-are spent on optimizing routes served by airlines, and therefore we can assume the airports with
+can at the very least assume the airlines are not operating empty flights. A lot of effort is put
+into optimizing routes served by airlines, and therefore we can assume the airports with
 the most offers available are also the most desired destinations among holiday-goers.
 
 |Airport|Airport name|Number of visits|
@@ -190,7 +197,7 @@ First, let's take a look at economy class flights.
 
 ![Low cost carriers](./plots/buckets_coach_B6_NK_SY_F9.png)
 
-We can see that the, for both types of carriers, the price gradually increases the closer
+We can see that, for both types of carriers, the price gradually increases the closer
 we get to the day of the flight, however, the increase in price is quite small. The increase
 in price is more notable for LCCs, though that can be explained by the fact that LCCs tend
 to price their tickets lower and thus there's more room for growth.
@@ -224,7 +231,7 @@ with Monday (=0) and end with Sunday (=6).
 ![Low cost carriers](./plots/dow_coach_B6_NK_SY_F9.png)
 
 As we can see, the prices remain mostly consistent throughout the entire week, although
-they droop down slightly on Tuesdays and Wednesdays.
+there is a slight decrease in price on Tuesdays and Wednesdays.
 
 However, things seem to change in business class.
 
@@ -243,7 +250,7 @@ of affluent people. Fewer people fly during the midweek (as they're either at wo
 on a business trip).
 
 The drop in price in business class is more notable than it is in coach, but the reason
-for the discount in ticket prices is the same.
+for the discount in ticket prices is the same for both classes.
 
 The disparity in pricing between LCCs and traditional carriers is, yet again, caused by
 a difference between clientele.
@@ -286,7 +293,7 @@ The statistics for traditional carriers, however, tell a different story. The ti
 start lower as the aircraft is mostly empty. As the seats get more and more sold out, the
 ticket prices creep up, as the airline tries to create a sense of urgency and sell expensive
 tickets to people in need. However, the prices then seem to drop drastically for the very last
-available seat on the plane. Why is that? It could be because the airline are making last minute
+available seat on the plane. Why is that? It could be because the airlines are making last minute
 offers one day before the flight, but it could also be because the passenger can no longer
 choose their seat, as all the other seats have already been reserved, and the passenger is
 unlikely to sit alone or get a desirable seat.
@@ -322,11 +329,11 @@ who value flexibility over money.
 
 To perform this analysis, we must first try to perform deduplication of flights. Flights
 are hashed by their time of departure, origin and destination airports, flight operator
-and aircraft. We want to ensure no flight is counted multiple times in case there are
-multiple offers for one flight in the dataset.
+and, aircraft. We want to ensure no flight is counted multiple times in case there are
+multiple offers for one flight present in the dataset.
 
 Except for very special flights, such as first flight of an aircraft of a certain type
-or exhibition flights, tickets aren't usually sold out by how desirable the flight is.
+or exhibition flights, tickets aren't usually sold out by how desirable the aircraft is.
 Since the dataset only contains flights across the contiguous US, we can assume the
 aircraft with the most offers available are also among the most used aircraft in the US,
 as the dataset only includes short-haul flights. If the dataset also included long-haul
@@ -348,14 +355,18 @@ distance than aircraft on short haul flights.
 
 Perhaps a bit surprisingly, Airbus has managed to take the lead as the preferred manufacturer.
 The US is a home to Boeing, and, in the past, the Boeing 737 used to be the most widespread
-passenger aircraft. However, very recently, partly also due to the MAX-8 fiasco, the
-Airbus A320 has managed to overtake the B737 in the total number of orders.
+passenger aircraft in the world. However, very recently, partly also due to the MAX-8 fiasco,
+the Airbus A320 has managed to overtake the B737 in the total number of orders.
 
 Even by adding the three narrow-bodies built by Boeing and present in the list, we end up
 10000 flights short of the Airbus A320, and that does not include the A220, which is also
 becoming increasingly more popular (and that Boeing has no answer for).
 
-However, Boeing wide-bodies are a lot more popular than Airbus wide-bodies.
+However, Boeing wide-bodies (B767, B777, B787 Dreamliner) are a lot more popular than Airbus
+wide-bodies (Airbus A350, Airbus A330).
+
+Regional turbofan aircraft (CRJ's, E175) are also rather common, and there are even a couple
+turboprops in the list.
 
 |model|count|
 |------------|-----|
@@ -407,13 +418,24 @@ of traditional carriers.
 
 ## Is business class priced differently on wide-bodies
 
-Economy is the same on narrow bodies and wide bodies. Business class can differ
-because wide-bodies are used for long haul flights and thus it's more desirable
-for airlines to provide a better product. The question is, does the price
-of business class tickets correlate with the number of aisles?
+Economy tends to be rather similar among both narrowbody and widebody aircraft. 
+(Actually narrowbodies may not have an IFE system fitted and the seats might use
+a different material -- leather is used for short-haul flights because it's easier
+to clean after the flight, but fabric is used for long-haul flights, because it
+allows the human body to breath better and thus the passengers sweat less and feel
+better throughout the long flight, but the difference is still rather minor).
+
+Business class can differ because wide-bodies are used for long haul flights
+and thus it's more desirable for airlines to provide a better product.
+The question is, does the price of business class tickets correlate with
+the amount of aisles?
 
 Yet again, we want to split the tickets into multiple buckets, this time by travel
-distance, to ensure we are comparing fares for similar flights.
+distance, to ensure we are comparing fares of similar routes. Again, we can only
+perform such a simple analysis because we're only analyzing domestic air travel
+across the contiguous US. International air travel would be a lot more complicated
+to analyze due to differences in air traffic fees, landing fees, taxes, and even
+closed airspaces.
 
 |bucket|4|5|
 |------|-|-|
@@ -425,12 +447,12 @@ distance, to ensure we are comparing fares for similar flights.
 
 The result is rather surprising. Even though we may expect a better product on wide-body
 aircraft, the tickets seem to be priced lower. One possible explanation is that there are way
-too many business class seats to fill on a domestic flight, that the airlines have to
+too many business class seats to fill on a domestic flight, and the airlines have to
 price the tickets lower to make sure they sell a sufficient amount of business class tickets.
 
-Another possible explanation is that widebodies are used on more desired routes -- and airlines
+Another possible explanation is that widebodies are used on more desired routes and airlines
 will likely face higher competition on such routes, therefore they have to lower their prices
-to stay competetive, whereas on more niche routes where there is less competition, and where
+to stay competetive, whereas on more niche routes, where there is less competition, and where
 narrowbody aircraft would be used, people are happy to find any flight and are more willing
 to shell out a higher sum of money.
 
