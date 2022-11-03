@@ -16,6 +16,23 @@ criteria, only flights where all legs meet the criteria are considered. I.e. if 
 analyzing economy class of low cost carriers (LCCs), all legs of the flight must be
 operated by an LCC and the travel class for each leg must be economy.
 
+### Running the code
+
+```sh
+virtualenv venv --python=python3.10
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Datasets must be downloaded separately as the dataset with the flight offerings is
+# rather large
+
+# Sample the dataset
+python3 airline_fares/sample.py sample --dataset path/to/dataset.csv --output data/sample.csv
+
+# Run the analysis
+python3 airline_fares
+```
+
 ## Do the offers include multisegment flights with airlines without a codeshare agreement?
 
 We aggregate the data by looking at which airlines appeared alongside one another in
