@@ -8,13 +8,15 @@ def gen_combinations(begin: int, end: int, elems: int) -> list[list[int]]:
     if elems <= 0:
         return all_combinations
 
-    # Python ranges are exclusive, end param of this function is inclusive, thus we add +1
-    # Combinations of one element (with begin == end) need to actually contain that one element,
-    # begin must not equal end, hence we add another +1
+    # Python ranges are exclusive, end param of this function is inclusive,
+    # thus we add +1 combinations of one element (with begin == end) need to
+    # actually contain that one element, begin must not equal end, hence we add
+    # another +1
     for i in range(begin, end+2-elems):
         start = [i]
         combinations = gen_combinations(i+1, end, elems-1)
-        all_combinations += [start + c for c in combinations] if combinations else [start]
+        all_combinations += [start + c for c in combinations] \
+            if combinations else [start]
 
     return all_combinations
 
@@ -121,7 +123,6 @@ def gen_rules_for_set(fis: set[int], ds: list[set[int]], conf: float) -> set[tup
 
     for elems in range(1, len(as_list)):
         subsets = get_combinations(as_list, elems) 
-        print(f'{subsets=}')
         for subset in subsets:
             as_set = set(subset)
             l, r = as_set, fis - as_set
