@@ -6,9 +6,23 @@ import Data.Set (toList, fromList)
 import Data.Function (on)
 import Control.Arrow (ArrowChoice(left))
 
+import System.Random
+
 data DS = DS [[Float]] [String] [String]
 
 data Tree = Root Int Float Tree Tree | Leaf String
+
+genRandomMask :: Int -> [Bool]
+genRandomMask len = generate baseGen len
+    where
+        dist = uniformR (1::Int, 5::Int)
+        baseGen = mkStdGen 13
+        generate gen len
+            | len == 0  = []
+            | otherwise = let
+                (num, nextGen) = dist gen
+            in
+                (num == 5) : generate nextGen (pred len)
 
 filterByMask :: [a] -> [Bool] -> [a]
 filterByMask lst mask = [value | (value, flag) <- zip lst mask, flag]
