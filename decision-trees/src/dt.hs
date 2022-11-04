@@ -8,6 +8,14 @@ import Data.Function (on)
 type DS = ([[Float]], [String], [String])
 
 
+numAttrs :: DS -> Int
+numAttrs (h: _, _, _) = length h
+
+
+attrList :: DS -> [Int]
+attrList ds = [0..(pred (numAttrs ds))]
+
+
 unique :: [String] -> [String]
 unique = toList . fromList
 
@@ -93,8 +101,13 @@ giniForSplit values classes classSet split =
         leftCounts  = map (countClass left) classSet
         rightCounts = map (countClass right) classSet
 
-        leftProbs  = map (((^2) . (/ leftLen)) . fromIntegral) leftCounts
-        rightProbs = map (((^2) . (/ rightLen)) . fromIntegral) rightCounts
+        prob :: Float -> Int -> Float
+        prob 0 _ = 0
+        prob _ 0 = 0
+        prob len count = (fromIntegral count / len)^2
+
+        leftProbs  = map (prob leftLen) leftCounts
+        rightProbs = map (prob rightLen) rightCounts
 
         giniLeft  = 1 - sum leftProbs
         giniRight = 1 - sum rightProbs
@@ -117,15 +130,15 @@ main = do
     contents <- readFile infile
 
     let allLines      = lines contents
-        untyped       = if header then tail allLines else allLines
+        nonEmpty      = filter (not . null) allLines
+        untyped       = if header then tail nonEmpty else nonEmpty
         split         = map (splitStr separator) untyped
         attrCols      = map init split
         classes       = map last split
         uniqueClasses = unique classes
         attributes    = map (map (if dataType == "char" then ticTacToeToFloat else readAttr)) attrCols
-        numAttributes = length (head attributes)
-        attrIndices   = [0..(pred numAttributes)]
         df            = (attributes, classes, uniqueClasses)
+        attrIndices   = attrList df
 
     putStrLn "Dataset Loaded"
 
