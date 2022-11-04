@@ -1,0 +1,36 @@
+cabal-version:      2.4
+name:               decisiontrees
+version:            1.0.0.0
+
+-- A short (one-line) description of the package.
+-- synopsis:
+
+-- A longer description of the package.
+-- description:
+
+-- A URL where users can report bugs.
+-- bug-reports:
+license:            NONE
+author:             Filip Peterek
+maintainer:         filip.peterek@vsb.cz
+
+-- A copyright notice.
+-- copyright:
+-- category:
+extra-source-files:
+    README.md
+
+executable decisiontrees
+    main-is:          dt.hs
+
+    -- Modules included in this executable, other than Main.
+    -- other-modules:
+
+    -- LANGUAGE extensions used by modules in this package.
+    -- other-extensions:
+    build-depends:    
+        base ^>=4.16.3.0,
+        containers ^>= 0.6.5.1,
+        random ^>= 1.2.1.1
+    hs-source-dirs:   src
+    default-language: Haskell2010

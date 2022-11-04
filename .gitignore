@@ -8,4 +8,5 @@ data/
 *.bat
 build/
 .gradle
+dist-newstyle/
 
