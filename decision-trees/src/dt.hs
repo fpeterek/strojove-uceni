@@ -12,6 +12,13 @@ data DS = DS [[Float]] [String] [String]
 
 data Tree = Root Int Float Tree Tree | Leaf String
 
+
+treeDepth :: Tree -> Int
+treeDepth (Leaf _) = 1
+treeDepth (Root _ _ l r) = succ (max (treeDepth l) (treeDepth r))
+    
+
+
 genRandomMask :: Int -> [Bool]
 genRandomMask len = generate baseGen len
     where
@@ -197,7 +204,6 @@ main = do
         dataType  = args !! 3
         separator = head (args !! 4)
 
-    putStrLn "Args Parsed"
     contents <- readFile infile
 
     let allLines      = lines contents
@@ -208,12 +214,19 @@ main = do
         classes       = map last split
         uniqueClasses = unique classes
         attributes    = map (map (if dataType == "char" then ticTacToeToFloat else readAttr)) attrCols
-        df            = DS attributes classes uniqueClasses
+        trainMask     = genRandomMask (length attributes)
+        validMask     = invertMask trainMask
+        trainAttrs    = filterByMask attributes trainMask
+        trainClasses  = filterByMask classes trainMask
+        validAttrs    = filterByMask attributes validMask
+        validClasses  = filterByMask classes validMask
+
+        df            = DS trainAttrs trainClasses uniqueClasses
+        testDf        = DS validAttrs validClasses uniqueClasses
         attrIndices   = attrList df
 
-    putStrLn "Dataset Loaded"
-
     let tree = createTree df attrIndices depth
+    print (treeDepth tree)
 
     putStrLn "Shutting down"
 
