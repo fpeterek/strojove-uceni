@@ -24,6 +24,9 @@ genRandomMask len = generate baseGen len
             in
                 (num == 5) : generate nextGen (pred len)
 
+invertMask :: [Bool] -> [Bool]
+invertMask lst = map not lst
+
 filterByMask :: [a] -> [Bool] -> [a]
 filterByMask lst mask = [value | (value, flag) <- zip lst mask, flag]
 
