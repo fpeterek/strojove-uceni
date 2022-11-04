@@ -4,19 +4,43 @@ import System.Environment
 import Data.List
 import Data.Set (toList, fromList)
 import Data.Function (on)
+import Control.Arrow (ArrowChoice(left))
 
-type DS = ([[Float]], [String], [String])
+data DS = DS [[Float]] [String] [String]
 
+data Tree = Root Int Float Tree Tree | Leaf String
+
+filterByMask :: [a] -> [Bool] -> [a]
+filterByMask lst mask = [value | (value, flag) <- zip lst mask, flag]
+
+mode :: Ord a => [a] -> a
+mode lst = maxVal
+    where
+        values = unique lst
+        countValue desired = (sum [1 :: Int | val <- lst, val == desired], desired)
+        counts = map countValue values
+        (count, maxVal) = maximumBy (compare `on` fst) counts
+
+
+predict :: Tree -> [Float] -> String
+predict (Root attr split left right) record = correctTree `predict` record
+    where
+        desiredAttr = record !! attr
+        correctTree
+            | desiredAttr <= split = left
+            | otherwise            = right
+
+predict (Leaf value) record = value
 
 numAttrs :: DS -> Int
-numAttrs (h: _, _, _) = length h
+numAttrs (DS (h: _) _ _) = length h
 
 
 attrList :: DS -> [Int]
 attrList ds = [0..(pred (numAttrs ds))]
 
 
-unique :: [String] -> [String]
+unique :: Ord a => [a] -> [a]
 unique = toList . fromList
 
 
@@ -71,7 +95,7 @@ minimizeGini ds attributes =
 
 giniOnAttr :: DS -> Int -> (Float, Float)
 giniOnAttr ds attr = let
-        (attrs, classes, classSet) = ds
+        DS attrs classes classSet = ds
 
         desAttr   = map (!! attr) attrs
         minVal    = minimum desAttr
@@ -116,6 +140,36 @@ giniForSplit values classes classSet split =
     in
         giniTotal
 
+-- data Tree = Root Int Float Tree Tree | Leaf Int Float String String
+-- minimizeGini :: DS -> [Int] -> (Int, Float)
+
+createTree :: DS -> [Int] -> Int -> Tree
+createTree (DS _ classes _) trainAttrs 1 = Leaf (mode classes)
+
+createTree ds trainAttrs depth =
+    let 
+        (DS attrs classes uniqueClasses) = ds
+        (splitOn, threshold)             = minimizeGini ds trainAttrs
+
+        splitAttr      = map (!! splitOn) attrs
+        zipped         = zip attrs classes
+
+        leftMask       = map (<= threshold) splitAttr
+        rightMask      = map (>  threshold) splitAttr
+
+        attributesLeft = filter (/= splitOn) trainAttrs
+
+        valuesLeft     = filterByMask attrs leftMask
+        classesLeft    = filterByMask classes leftMask
+        leftTree       = createTree (DS valuesLeft classesLeft uniqueClasses) attributesLeft (pred depth)
+
+        valuesRight    = filterByMask attrs rightMask
+        classesRight   = filterByMask classes rightMask
+        rightTree      = createTree (DS valuesRight classesRight uniqueClasses) attributesLeft (pred depth)
+
+        tree           = Root splitOn threshold leftTree rightTree
+    in
+        tree
 
 main = do
     args <- getArgs
@@ -137,12 +191,12 @@ main = do
         classes       = map last split
         uniqueClasses = unique classes
         attributes    = map (map (if dataType == "char" then ticTacToeToFloat else readAttr)) attrCols
-        df            = (attributes, classes, uniqueClasses)
+        df            = DS attributes classes uniqueClasses
         attrIndices   = attrList df
 
     putStrLn "Dataset Loaded"
 
-    print (minimizeGini df attrIndices)
+    let tree = createTree df attrIndices depth
 
     putStrLn "Shutting down"
 
