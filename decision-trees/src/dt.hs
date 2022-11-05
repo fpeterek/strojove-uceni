@@ -32,7 +32,7 @@ genRandomMask len = generate baseGen len
                 (num == 5) : generate nextGen (pred len)
 
 invertMask :: [Bool] -> [Bool]
-invertMask lst = map not lst
+invertMask = map not
 
 filterByMask :: [a] -> [Bool] -> [a]
 filterByMask lst mask = [value | (value, flag) <- zip lst mask, flag]
@@ -41,9 +41,13 @@ mode :: Ord a => [a] -> a
 mode lst = maxVal
     where
         values = unique lst
-        countValue desired = (sum [1 :: Int | val <- lst, val == desired], desired)
+        countValue val = (countOccurrences lst val, val)
         counts = map countValue values
         (count, maxVal) = maximumBy (compare `on` fst) counts
+
+
+countOccurrences :: Eq a => [a] -> a -> Int
+countOccurrences lst value = sum [1 :: Int | val <- lst, val == value]
 
 
 predict :: Tree -> [Float] -> String
@@ -103,7 +107,7 @@ readAttr = read
 giniSteps = 20 :: Float
 
 
-minimizeGini :: DS -> [Int] -> (Int, Float)
+minimizeGini :: DS -> [Int] -> (Int, Float, Float)
 minimizeGini ds attributes = 
     let
         getGiniIndex = giniOnAttr ds
@@ -112,9 +116,9 @@ minimizeGini ds attributes =
         -- Empty structure
         best         = minimumBy (compare `on` (snd . fst)) zipped
 
-        ((_, split), idx) = best
+        ((giniIndex, threshold), attr) = best
     in
-        (idx, split)
+        (attr, threshold, giniIndex)
 
 
 giniOnAttr :: DS -> Int -> (Float, Float)
@@ -164,8 +168,6 @@ giniForSplit values classes classSet split =
     in
         giniTotal
 
--- data Tree = Root Int Float Tree Tree | Leaf Int Float String String
--- minimizeGini :: DS -> [Int] -> (Int, Float)
 
 createTree :: DS -> [Int] -> Int -> Tree
 createTree (DS _ classes _) trainAttrs 1 = Leaf (mode classes)
@@ -173,7 +175,7 @@ createTree (DS _ classes _) trainAttrs 1 = Leaf (mode classes)
 createTree ds trainAttrs depth =
     let 
         (DS attrs classes uniqueClasses) = ds
-        (splitOn, threshold)             = minimizeGini ds trainAttrs
+        (splitOn, threshold, giniIndex)  = minimizeGini ds trainAttrs
 
         splitAttr      = map (!! splitOn) attrs
         zipped         = zip attrs classes
@@ -182,6 +184,11 @@ createTree ds trainAttrs depth =
         rightMask      = map (>  threshold) splitAttr
 
         attributesLeft = filter (/= splitOn) trainAttrs
+
+        -- If we got a prefect split, we can set depth to one to force
+        -- the program to create leaves and prevent the creation of an
+        -- unnecessarily deep tree
+        nextDepth      = if giniIndex == 0 then 1 else pred depth
 
         valuesLeft     = filterByMask attrs leftMask
         classesLeft    = filterByMask classes leftMask
@@ -194,6 +201,20 @@ createTree ds trainAttrs depth =
         tree           = Root splitOn threshold leftTree rightTree
     in
         tree
+
+
+
+
+-- data DS = DS [[Float]] [String] [String]
+testPrediction :: Tree -> DS -> Float
+testPrediction tree (DS attrs classes _) = let
+        predictions = map (predict tree) attrs
+        isCorrect   = [pred == act | (pred, act) <- zip predictions classes]
+        total       = fromIntegral (length classes)
+        accurate    = fromIntegral (countOccurrences isCorrect True)
+    in
+        accurate / total
+
 
 main = do
     args <- getArgs
@@ -221,13 +242,19 @@ main = do
         validAttrs    = filterByMask attributes validMask
         validClasses  = filterByMask classes validMask
 
-        df            = DS trainAttrs trainClasses uniqueClasses
+        trainDf       = DS trainAttrs trainClasses uniqueClasses
         testDf        = DS validAttrs validClasses uniqueClasses
-        attrIndices   = attrList df
+        attrIndices   = attrList trainDf
 
-        tree          = createTree df attrIndices depth
+        tree          = createTree trainDf attrIndices depth
 
     print (treeDepth tree)
+
+    putStr "Prediction on train ds: "
+    print (testPrediction tree trainDf)
+
+    putStr "Prediction on test ds: "
+    print (testPrediction tree testDf)
 
     putStrLn "Shutting down"
 
