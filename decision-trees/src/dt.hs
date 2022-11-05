@@ -198,11 +198,11 @@ createTree ds trainAttrs depth =
 main = do
     args <- getArgs
 
-    let infile    = head args
-        depth     = read (args !! 1 ) :: Int
-        header    = args !! 2 == "y"
-        dataType  = args !! 3
-        separator = head (args !! 4)
+    let infile    = args !! 1
+        depth     = read (args !! 2 ) :: Int
+        header    = (args !! 3) `elem` ["y", "yes", "Y", "YES", "Yes", "1"]
+        dataType  = args !! 4
+        separator = head (args !! 5)
 
     contents <- readFile infile
 
@@ -225,7 +225,8 @@ main = do
         testDf        = DS validAttrs validClasses uniqueClasses
         attrIndices   = attrList df
 
-    let tree = createTree df attrIndices depth
+        tree          = createTree df attrIndices depth
+
     print (treeDepth tree)
 
     putStrLn "Shutting down"
