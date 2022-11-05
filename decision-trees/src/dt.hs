@@ -216,6 +216,25 @@ testPrediction tree (DS attrs classes _) = let
         accurate / total
 
 
+testDepth :: DS -> DS -> Int -> (Float, Float)
+testDepth train test depth =
+    let
+        attrIndices   = attrList train
+        tree          = createTree train attrIndices depth
+        trainAcc      = testPrediction tree train
+        testAcc       = testPrediction tree test
+    in
+        (trainAcc, testAcc)
+
+testAll :: DS -> DS -> [(Float, Float)]
+testAll train test =
+    let
+        depths  = length (attrList train)
+        range   = [1..depths]
+        results = map (testDepth train test) range
+    in
+        results
+
 main = do
     args <- getArgs
 
@@ -244,17 +263,14 @@ main = do
 
         trainDf       = DS trainAttrs trainClasses uniqueClasses
         testDf        = DS validAttrs validClasses uniqueClasses
-        attrIndices   = attrList trainDf
+        results       = testAll trainDf testDf
+        depths        = [1..(length (attrList trainDf))]
+        zippedRes     = zip depths results
+        strRes        = map resToStr zippedRes
 
-        tree          = createTree trainDf attrIndices depth
+        resToStr (dep, acc) = show dep ++ ": " ++ show acc
 
-    print (treeDepth tree)
-
-    putStr "Prediction on train ds: "
-    print (testPrediction tree trainDf)
-
-    putStr "Prediction on test ds: "
-    print (testPrediction tree testDf)
+    mapM_ putStrLn strRes
 
     putStrLn "Shutting down"
 
