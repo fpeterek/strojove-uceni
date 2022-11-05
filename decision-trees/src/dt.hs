@@ -198,11 +198,11 @@ createTree ds trainAttrs depth =
 main = do
     args <- getArgs
 
-    let infile    = args !! 1
-        depth     = read (args !! 2 ) :: Int
-        header    = (args !! 3) `elem` ["y", "yes", "Y", "YES", "Yes", "1"]
-        dataType  = args !! 4
-        separator = head (args !! 5)
+    let infile    = head args
+        depth     = read (args !! 1 ) :: Int
+        header    = (args !! 2) `elem` ["y", "yes", "Y", "YES", "Yes", "1"]
+        dataType  = args !! 3
+        separator = head (args !! 4)
 
     contents <- readFile infile
 
