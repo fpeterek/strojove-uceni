@@ -300,14 +300,10 @@ main = do
 
         resToStr (dep, acc) = show dep ++ ": " ++ show acc
 
+    -- print trainAttrs
+    -- print trainClasses
     print (attrList trainDf)
     print (treeDepth tree)
     print tree
 
     mapM putStrLn strRes
-
-    -- print trainAttrs
-    -- print trainClasses
-
-    -- putStrLn "Shutting down"
-
