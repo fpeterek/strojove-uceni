@@ -12,12 +12,34 @@ data DS = DS [[Float]] [String] [String]
 
 data Tree = Root Int Float Tree Tree | Leaf String
 
+data GiniIndex =
+    GiniIndex
+        Float -- Total
+        Float -- Left
+        Float -- Right
+
+instance Eq GiniIndex where
+    (GiniIndex l1 l2 l3) == (GiniIndex r1 r2 r3) = l1 == r1 && l2 == r2 && l3 == r3
+
+instance Ord GiniIndex where
+    compare (GiniIndex i1 _ _) (GiniIndex i2 _ _) = i1 `compare` i2
+
+data GiniSplit =
+    GiniSplit
+        Int       -- Attribute
+        Float     -- Threshold
+        GiniIndex -- Gini Index
+
+
+instance Show Tree where
+    show (Leaf value) = "{\"class\":\"" ++ value ++ "\"}"
+    show (Root attr th l r) = "{\"attr\":" ++ show attr ++ ",\"th\":" ++ show th ++ ",\"l\":" ++ show l ++ ",\"r\":" ++ show r ++ "}"
+
 
 treeDepth :: Tree -> Int
 treeDepth (Leaf _) = 1
 treeDepth (Root _ _ l r) = succ (max (treeDepth l) (treeDepth r))
     
-
 
 genRandomMask :: Int -> [Bool]
 genRandomMask len = generate baseGen len
@@ -104,10 +126,10 @@ readAttr :: String -> Float
 readAttr = read
 
 
-giniSteps = 20 :: Float
+giniSteps = 5 :: Float
 
 
-minimizeGini :: DS -> [Int] -> (Int, Float, Float)
+minimizeGini :: DS -> [Int] -> GiniSplit
 minimizeGini ds attributes = 
     let
         getGiniIndex = giniOnAttr ds
@@ -116,12 +138,12 @@ minimizeGini ds attributes =
         -- Empty structure
         best         = minimumBy (compare `on` (snd . fst)) zipped
 
-        ((giniIndex, threshold), attr) = best
+        ((threshold, giniIndex), attr) = best
     in
-        (attr, threshold, giniIndex)
+        GiniSplit attr threshold giniIndex
 
 
-giniOnAttr :: DS -> Int -> (Float, Float)
+giniOnAttr :: DS -> Int -> (Float, GiniIndex)
 giniOnAttr ds attr = let
         DS attrs classes classSet = ds
 
@@ -132,12 +154,14 @@ giniOnAttr ds attr = let
         range     = [minVal-step,minVal..maxVal+step]
         giniIdx   = giniForSplit desAttr classes classSet
         allSplits = [(split, giniIdx split) | split <- range ]
-        bestSplit = minimumBy (compare `on` snd) allSplits
+        bestSplit = minimumBy compare' allSplits
+
+        compare' x y  = snd x `compare` snd y
     in
         bestSplit
 
 
-giniForSplit :: [Float] -> [String] -> [String] -> Float -> Float
+giniForSplit :: [Float] -> [String] -> [String] -> Float -> GiniIndex
 giniForSplit values classes classSet split =
     let 
         ziped    = zip values classes
@@ -166,7 +190,7 @@ giniForSplit values classes classSet split =
 
         giniTotal = giniLeft * (leftLen / total) + giniRight * (rightLen / total)
     in
-        giniTotal
+        GiniIndex giniTotal giniLeft giniRight
 
 
 createTree :: DS -> [Int] -> Int -> Tree
@@ -174,35 +198,38 @@ createTree (DS _ classes _) trainAttrs 1 = Leaf (mode classes)
 
 createTree ds trainAttrs depth =
     let 
-        (DS attrs classes uniqueClasses) = ds
-        (splitOn, threshold, giniIndex)  = minimizeGini ds trainAttrs
+        DS attrs classes uniqueClasses        = ds
+        GiniSplit splitOn threshold giniIndex = minimizeGini ds trainAttrs
+        GiniIndex totalIdx leftIdx rightIdx   = giniIndex
 
         splitAttr      = map (!! splitOn) attrs
         zipped         = zip attrs classes
 
         leftMask       = map (<= threshold) splitAttr
-        rightMask      = map (>  threshold) splitAttr
+        rightMask      = invertMask leftMask
 
         attributesLeft = filter (/= splitOn) trainAttrs
 
         -- If we got a prefect split, we can set depth to one to force
         -- the program to create leaves and prevent the creation of an
         -- unnecessarily deep tree
-        nextDepth      = if giniIndex == 0 then 1 else pred depth
+        leftDepth      = if leftIdx == 0 then 1 else pred depth
+        rightDepth     = if rightIdx == 0 then 1 else pred depth
 
         valuesLeft     = filterByMask attrs leftMask
         classesLeft    = filterByMask classes leftMask
-        leftTree       = createTree (DS valuesLeft classesLeft uniqueClasses) attributesLeft (pred depth)
+        leftTree       = createTree (DS valuesLeft classesLeft uniqueClasses) attributesLeft leftDepth
 
         valuesRight    = filterByMask attrs rightMask
         classesRight   = filterByMask classes rightMask
-        rightTree      = createTree (DS valuesRight classesRight uniqueClasses) attributesLeft (pred depth)
+        rightTree      = createTree (DS valuesRight classesRight uniqueClasses) attributesLeft rightDepth
 
         tree           = Root splitOn threshold leftTree rightTree
+        leaf           = Leaf (mode classes)
+
+        result         = if totalIdx == 0 then leaf else tree
     in
-        tree
-
-
+        result
 
 
 -- data DS = DS [[Float]] [String] [String]
@@ -247,7 +274,8 @@ main = do
     contents <- readFile infile
 
     let allLines      = lines contents
-        nonEmpty      = filter (not . null) allLines
+        nonCR         = map (filter (/= '\r')) allLines
+        nonEmpty      = filter (not . null) nonCR
         untyped       = if header then tail nonEmpty else nonEmpty
         split         = map (splitStr separator) untyped
         attrCols      = map init split
@@ -268,9 +296,18 @@ main = do
         zippedRes     = zip depths results
         strRes        = map resToStr zippedRes
 
+        tree = createTree trainDf (attrList trainDf) depth
+
         resToStr (dep, acc) = show dep ++ ": " ++ show acc
 
-    mapM_ putStrLn strRes
+    print (attrList trainDf)
+    print (treeDepth tree)
+    print tree
 
-    putStrLn "Shutting down"
+    mapM putStrLn strRes
+
+    -- print trainAttrs
+    -- print trainClasses
+
+    -- putStrLn "Shutting down"
 
