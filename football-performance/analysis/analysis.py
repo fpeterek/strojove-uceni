@@ -60,7 +60,7 @@ def cluster(df, cluster_alg):
     df = df.copy()
     df['cluster_id'] = cluster_alg.labels_
 
-    grouped = df.groupby(['cluster_id'])
+    grouped = df.groupby('cluster_id')
 
     return grouped
 
@@ -68,11 +68,14 @@ def cluster(df, cluster_alg):
 def print_clusters(df):
     for clusterid, cluster in df:
         print(clusterid)
-        print(' '.join(cluster['Key']))
+        print('<details>')
+        print(', '.join(cluster['Key']))
+        print('</details>')
 
 
 def cluster_df(df, alg, algname):
     print(f'----------------- {algname} -----------------')
+    print(f'### {algname}')
     clusters = cluster(df, alg)
     print_clusters(clusters)
 
