@@ -125,6 +125,43 @@ def analyze_scaled_domestic(df):
     analyze_df(df, dbscan, kmeans)
 
 
+def analyze_selected_europe(df):
+    dbscan = sklearn.cluster.DBSCAN(eps=0.275, min_samples=3)
+    kmeans = sklearn.cluster.KMeans(n_clusters=12, random_state=747)
+
+    cols = [
+            'Key',
+            'Possession', 'ShortPassesPerGame', 'ThroughBallsPerGame',
+            'LongBallsPerGame', 'CounterAttackGoals',
+            'TotalShotsPerGame', 'GoalsPerGame',
+            'AccShortPassesPerGame', 'AccurateLongBallsPerGame',
+            'ShotsOnTargetPer90'
+            ]
+
+    df = df[cols]
+
+    analyze_df(df, dbscan, kmeans)
+
+
+def analyze_selected_domestic(df):
+    dbscan = sklearn.cluster.DBSCAN(eps=0.15, min_samples=3)
+    kmeans = sklearn.cluster.KMeans(n_clusters=12, random_state=747)
+
+    cols = [
+            'Key',
+            'GoalDifference',
+            'Possession', 'ShortPassesPerGame', 'ThroughBallsPerGame',
+            'LongBallsPerGame', 'CounterAttackGoals',
+            'TotalShotsPerGame', 'GoalsPerGame',
+            'AccShortPassesPerGame', 'AccurateLongBallsPerGame',
+            'ShotsOnTargetPer90'
+            ]
+
+    df = df[cols]
+
+    analyze_df(df, dbscan, kmeans)
+
+
 def scale(df, attr, scaler):
     df[attr] = scaler.fit_transform(df[[attr]])
 
@@ -145,17 +182,20 @@ def run_analysis():
     df = load_df('data/data.csv')
     domestic, europe = split_df(df)
 
-    # histplot(europe)
-    # histplot(domestic)
+    histplot(europe)
+    histplot(domestic)
 
     nonna_attrs(europe)
     nonna_attrs(domestic)
 
-    # analyze_unprocessed(europe)
-    # analyze_unprocessed(domestic)
+    analyze_unprocessed(europe)
+    analyze_unprocessed(domestic)
 
     scaled_europe = scale_attrs(europe)
     scaled_domestic = scale_attrs(domestic)
 
     analyze_scaled_europe(scaled_europe)
     analyze_scaled_domestic(scaled_domestic)
+
+    analyze_selected_europe(scaled_europe)
+    analyze_selected_domestic(scaled_domestic)
