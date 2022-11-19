@@ -41,7 +41,7 @@ Paris Saint-Germain CL 2016/2017, Napoli CL 2016/2017, Paris Saint-Germain CL 20
 Borussia Dortmund CL 2016/2017, Paris Saint-Germain CL 2017/2018, Paris Saint-Germain CL 2018/2019, Juventus CL 2019/2020, Real Madrid CL 2019/2020, Juventus CL 2020/2021, Manchester City CL 2021/2022
 </details>
 
-DBSCAN does not yield interesting results, although that is perhaps a unsurprising for an unprocessed dataset. The clusters look like a mess.
+DBSCAN does not yield interesting results, although that is to be expected for an unprocessed dataset. The clusters look like a mess.
 
 ### KMeans
 
@@ -200,15 +200,15 @@ Cluster 10 also contains bigger teams from the other four major leagues.
 
 Clusters 0, 3, 7, 8, 9, 11 are composed of less successful teams.
 
-Cluster 0 may contains i.e. Hull F.C. from the 2009/2010 season, which, as we already know, had been relegated that season.
+Cluster 0 may contain i.e. Hull F.C. from the 2009/2010 season, which, as we already know, had been relegated that season.
 Deportivo Aláves was relegated in the season of 21/22, and is also present in this cluster. Hamburger SV finished just two places
 ahead of the relegation zone in 2016/17, Darmstadt was relegated in the same season. However, other teams from the cluster did
 not necessarily perform as bad. For example, Stoke finished in the middle of the table on 11th place in the 09/10 season. Pamplona Osasuna
-finished 12th in La Liga during the same season.
+finished 12th in La Liga during the same season. Therefore we can say this cluster is not really interesting.
 
 # Attribute scaling
 
-Just by looking at the histograms for each attribute ((Champions League)[plots/europe_histplot.png], (domestic leagues)[plots/europe_histplot.png]),
+Just by looking at the histograms for each attribute ([Champions League](plots/europe_histplot.png), [domestic leagues](plots/europe_histplot.png)),
 we can come to the conclusion that we should be fine scaling all the attributes using a minmax scaler. The vast majority of histograms resemble
 a bell curve.
 
@@ -245,16 +245,6 @@ Benfica CL 2017/2018, Bayer Leverkusen CL 2019/2020, Barcelona CL 2021/2022
 Schalke 04 CL 2018/2019, Lille CL 2021/2022, Salzburg CL 2021/2022
 </details>
 
-0 - Roma did fine, Benfica did well, AC Milan did fine
-1 - Genk was last in group, Viktoria Plzeň was third in group, -7 GD, BATE Borisov was last below VP
-2 - Rangers were third, Dinamo Zagreb last, -13 GD, Chelsea reached semifinal, Napoli got 12 points but
-    ended third
-
-3 - Sporting was last, Monaco was last, Olympiacos were third in group, Ajax was third
-4 - Benfica was last, -13 GD, 0 points, Bayer was third, Barcelona was third
-5 - Schalke was second, lost RO16 horribly, Salzburg did fine, lost RO16 horribly, Lille did fine,
-    lost RO16 horribly
-
 Yet again, we can't really talk about high quality clustering. We can, however, notice, that clustering
 seems to ignore winners and teams that do fine and outline some of the teams which didn't do so well.
 
@@ -263,7 +253,7 @@ some of them didn't (i.e. Rangers in 2010/11, Dinamo Zagreb in 2012/13).
 
 Clusters 1, 3, 4 and 5 contain teams that didn't do as well. Teams in clusters 1, 3 and 4 came third or fourth during group stage.
 Teams from cluster 5 actually did well in their groups and managed to advance to the round of 16, when their spell came to a sour
-end as they lost the round of 16 horribly.
+end as they lost the round of 16 horribly, which makes cluster 5 somewhat interesting.
 
 ### KMeans
 
@@ -396,7 +386,7 @@ Eintracht Frankfurt DL 2017/2018, Hertha Berlin DL 2017/2018, FC Koln DL 2019/20
 DBSCAN, just as was the case during the CL analysis, does not seem to yield good results. The clustering parameters were
 set differently for CL and domestic leagues. Yet again, DBSCAN seems to pick out teams that do not perform that well,
 though cluster 4 also contains AC Milan, which won the Serie A in 2021/22, altough, arguably, they did not score that many
-goals.
+goals that season.
 
 The algorithm also grouped Real Betis, Getafe and Levante of 2015/16 together in group 7. Getafe and Levante were relegated,
 yet Real Betis ended 10th. Yet, despite actually winning more points then Getafe and Levante, Real Betis actually scored
@@ -576,6 +566,15 @@ as well as Chelsea prior to and just after winning the CL (though, curiously, th
 is missing).
 
 ## Domestic Leagues
+
+When analyzing domestic leagues, the following attributes were used.
+
+`GoalDifference`,
+`Possession`, `ShortPassesPerGame`, `ThroughBallsPerGame`,
+`LongBallsPerGame`, `CounterAttackGoals`,
+`TotalShotsPerGame`, `GoalsPerGame`,
+`AccShortPassesPerGame`, `AccurateLongBallsPerGame`,
+`ShotsOnTargetPer90`
 
 ### DBSCAN
 
