@@ -87,7 +87,7 @@ def nonna_attrs(df):
         notna_df = df[df[col].notna()]
         notna = notna_df.shape[0]
         na = total - notna
-        print(f'{col}: {total=}, {notna=}, {na=}')
+        # print(f'{col}: {total=}, {notna=}, {na=}')
 
         if not na:
             attrs.append(col)
@@ -95,17 +95,50 @@ def nonna_attrs(df):
     return attrs
 
 
-def analyze_df(df):
+def analyze_df(df, dbscan, kmeans):
 
     nonna = nonna_attrs(df)
     df = df[nonna]
 
-    dbscan = sklearn.cluster.DBSCAN(eps=33, min_samples=5)
-    # 8
-    kmeans = sklearn.cluster.KMeans(n_clusters=12, random_state=747)
-
     cluster_df(df, dbscan, 'DBSCAN')
     cluster_df(df, kmeans, 'KMeans')
+
+
+def analyze_unprocessed(df):
+    dbscan = sklearn.cluster.DBSCAN(eps=33, min_samples=5)
+    kmeans = sklearn.cluster.KMeans(n_clusters=12, random_state=747)
+
+    analyze_df(df, dbscan, kmeans)
+
+
+def analyze_scaled_europe(df):
+    dbscan = sklearn.cluster.DBSCAN(eps=1.05, min_samples=3)
+    kmeans = sklearn.cluster.KMeans(n_clusters=12, random_state=747)
+
+    analyze_df(df, dbscan, kmeans)
+
+
+def analyze_scaled_domestic(df):
+    dbscan = sklearn.cluster.DBSCAN(eps=0.73, min_samples=3)
+    kmeans = sklearn.cluster.KMeans(n_clusters=12, random_state=747)
+
+    analyze_df(df, dbscan, kmeans)
+
+
+def scale(df, attr, scaler):
+    df[attr] = scaler.fit_transform(df[[attr]])
+
+
+def scale_attrs(df):
+    num_only = df.select_dtypes(np.number)
+    scaler = sklearn.preprocessing.MinMaxScaler()
+
+    df = df.copy()
+
+    for col in num_only.columns:
+        scale(df, col, scaler)
+
+    return df
 
 
 def run_analysis():
@@ -118,5 +151,11 @@ def run_analysis():
     nonna_attrs(europe)
     nonna_attrs(domestic)
 
-    analyze_df(europe)
-    analyze_df(domestic)
+    # analyze_unprocessed(europe)
+    # analyze_unprocessed(domestic)
+
+    scaled_europe = scale_attrs(europe)
+    scaled_domestic = scale_attrs(domestic)
+
+    analyze_scaled_europe(scaled_europe)
+    analyze_scaled_domestic(scaled_domestic)
