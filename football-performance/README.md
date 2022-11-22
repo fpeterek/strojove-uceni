@@ -589,7 +589,7 @@ bigger teams, including some FC Barcelona squads.
 
 #### Long Balls
 
-![Accurate Long Passes](plots/AccLongBallsPerGame_champions_league.png)
+![Accurate Long Passes](plots/AccurateLongBallsPerGame_champions_league.png)
 
 ![Long Passes](plots/LongBallsPerGame_champions_league.png)
 
