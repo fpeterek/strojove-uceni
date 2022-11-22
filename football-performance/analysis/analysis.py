@@ -125,7 +125,19 @@ def analyze_scaled_domestic(df):
     analyze_df(df, dbscan, kmeans)
 
 
-def analyze_selected_europe(df):
+def plot_attr(df, comp, col):
+    plt.figure()
+    sns.boxplot(data=df, y=col, x='cluster_id')
+    file = f'plots/{col}_{comp}.png'
+    plt.savefig(file)
+
+
+def plot_graphs(df, comp, cols):
+    for col in cols:
+        plot_attr(df, comp, col)
+
+
+def analyze_selected_europe(df, df_scaled):
     dbscan = sklearn.cluster.DBSCAN(eps=0.275, min_samples=3)
     kmeans = sklearn.cluster.KMeans(n_clusters=12, random_state=747)
 
@@ -138,9 +150,12 @@ def analyze_selected_europe(df):
             'ShotsOnTargetPer90'
             ]
 
-    df = df[cols]
+    df_scaled = df_scaled[cols]
 
-    analyze_df(df, dbscan, kmeans)
+    analyze_df(df_scaled, dbscan, kmeans)
+
+    df['cluster_id'] = kmeans.labels_
+    plot_graphs(df, 'champions_league', set(cols) - {'Key'})
 
 
 def analyze_selected_domestic(df):
@@ -197,5 +212,5 @@ def run_analysis():
     analyze_scaled_europe(scaled_europe)
     analyze_scaled_domestic(scaled_domestic)
 
-    analyze_selected_europe(scaled_europe)
+    analyze_selected_europe(europe, scaled_europe)
     analyze_selected_domestic(scaled_domestic)

@@ -565,6 +565,68 @@ Cluster 8 contains many winning squads, such as Bayern of 2012/13, Real Madrid o
 as well as Chelsea prior to and just after winning the CL (though, curiously, the victorious squad
 is missing).
 
+Let's try and have a closer look at the clusters and compare how those teams play.
+
+#### Short Passes
+
+![Short Passes](plots/ShortPassesPerGame_champions_league.png).
+![Accurate Short Passes](plots/AccShortPassesPerGame_champions_league.png).
+
+The first thing we can notice is that both graphs are nearly identical. There is no cluster of teams
+which would be inherently bad at passing. Some teams do make fewer passes per game, and thus they
+obviously cannot have many successful passes, but their relative accuracy is not inherently worse.
+
+Clubs from cluster number 4 make the fewest passes. But, as we've established before, cluster 4
+contains small clubs from less smaller leagues and those clubs usually have less of a chance
+and spend the majority of the game without possesion of the ball.
+
+Clubs in clusters 10 and 11 make the most pass attempts, but, as we've said before, those clusters
+contain mostly Pep Guardiola's teams.
+
+Clubs in cluster 6 also make a rather large amount of pass attempts, though cluster 6 contains
+bigger teams, including some FC Barcelona squads.
+
+#### Long Balls
+
+![Accurate Long Passes](plots/AccLongBallsPerGame_champions_league.png).
+![Long Passes](plots/LongBallsPerGame_champions_league.png).
+
+Unsurprisingly, accuracy at short passing does not necessarily transform to accuracy
+at long balls.
+
+Barcelona (cluster 11) can be very accurate with their long passes, although cluster 11 contains
+earlier Barcelona squads with Xavi and Iniesta in the midfield, who would sometimes make long sideways
+passes from one side of the pitch to another to shift the game to a less crowded part of the pitch,
+instead of making long passes behind their opponents defense, which likely boosted their accuracy.
+
+Overall, though, Johan Cruyff didn't like long balls (clusters 10, 11).
+
+Teams from cluster 4 need to play long balls if they wish to accomplish anything, as they are not
+in possession of the ball that often, and thus, they do not trail their opponents in long pass attempts.
+Their accuracy, however, is not very high.
+
+Teams in cluster 0, 1 and 8 play a lot of long balls, and they tend to be the quite accurate, too.
+Cluster 8 contains many Real Madrid squads, the quality of squads in this cluster is undeniable and the
+statistics are unsurprising, Cluster 0, however, contains smaller teams from La Liga, alongside teams 
+from smaller leagues. And the Italian AC Milan, although Italian football tends to be more defensive
+and long balls make more sense in defensive football. Yet, even the somewhat smaller teams 
+(at least smaller in terms of Champions League) seem to be accurate with their long balls.
+
+#### Possession
+
+![Possession](plots/Possession_champions_league.png).
+
+Johan Cruyff was a fan of ball possession (clusters 10, 11).
+
+Bigger clubs from cluster 6 also have higher possession rates, although they trail squads managed
+by Pep Guardiola.
+
+Clubs from cluster 4 have low possession rates.
+
+#### Counter Attack Goals
+
+![Counter Attack Goals](plots/CounterAttackGoals_champions_league.png).
+
 ## Domestic Leagues
 
 When analyzing domestic leagues, the following attributes were used.
