@@ -569,8 +569,9 @@ Let's try and have a closer look at the clusters and compare how those teams pla
 
 #### Short Passes
 
-![Short Passes](plots/ShortPassesPerGame_champions_league.png).
-![Accurate Short Passes](plots/AccShortPassesPerGame_champions_league.png).
+![Short Passes](plots/ShortPassesPerGame_champions_league.png)
+
+![Accurate Short Passes](plots/AccShortPassesPerGame_champions_league.png)
 
 The first thing we can notice is that both graphs are nearly identical. There is no cluster of teams
 which would be inherently bad at passing. Some teams do make fewer passes per game, and thus they
@@ -588,8 +589,9 @@ bigger teams, including some FC Barcelona squads.
 
 #### Long Balls
 
-![Accurate Long Passes](plots/AccLongBallsPerGame_champions_league.png).
-![Long Passes](plots/LongBallsPerGame_champions_league.png).
+![Accurate Long Passes](plots/AccLongBallsPerGame_champions_league.png)
+
+![Long Passes](plots/LongBallsPerGame_champions_league.png)
 
 Unsurprisingly, accuracy at short passing does not necessarily transform to accuracy
 at long balls.
@@ -614,7 +616,7 @@ and long balls make more sense in defensive football. Yet, even the somewhat sma
 
 #### Possession
 
-![Possession](plots/Possession_champions_league.png).
+![Possession](plots/Possession_champions_league.png)
 
 Johan Cruyff was a fan of ball possession (clusters 10, 11).
 
@@ -625,7 +627,7 @@ Clubs from cluster 4 have low possession rates.
 
 #### Counter Attack Goals
 
-![Counter Attack Goals](plots/CounterAttackGoals_champions_league.png).
+![Counter Attack Goals](plots/CounterAttackGoals_champions_league.png)
 
 ## Domestic Leagues
 
