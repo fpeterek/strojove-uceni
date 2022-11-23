@@ -629,6 +629,37 @@ Clubs from cluster 4 have low possession rates.
 
 ![Counter Attack Goals](plots/CounterAttackGoals_champions_league.png)
 
+Since each team only plays a few matches in the Champions League,
+the results are unconclusive. Smaller teams from cluster 4 didn't
+score many goals, and a portion of not many is unlikely to be a lot.
+
+Teams in cluster 3 scored a lot of goals from counter attacks. Cluster 3
+contains a lot of British teams, or a rather defensive Atlético Madrid,
+so counter attacks can be expected from this cluster.
+
+#### Goal Attempts
+
+![Total Shots Per Game](plots/TotalShotsPerGame_champions_league.png)
+
+![Shots On Target Per Game](plots/ShotsOnTargetPer90_champions_league.png)
+
+![Goals Per Game](plots/GoalsPerGame_champions_league.png)
+
+Teams with higher possession rates tend to rack up more shots per game.
+Teams in clusters 8, 10 and 11 have the most shots per game. Clusters 10, 11
+contains possession-focused teams. Cluster 8 contains strong squads which can
+afford to play offensive football.
+
+Teams in clusters 10 and 11 tend to score the most goals per game. Even the strong
+squads from cluster 8 trail behind clusters 10 and 11.
+
+Small teams from clusters 4 and 9 make few attempts and score very few goals.
+
+Other than that, teams that make fewer shots tend to hit the goal less often
+and teams that make fewer shots score fewer goals. There is no cluster of
+hyperaccurate teams (although Arsenal once managed to finish a game with one
+goal to their name without attempting a single shot in the entire match).
+
 ## Domestic Leagues
 
 When analyzing domestic leagues, the following attributes were used.
