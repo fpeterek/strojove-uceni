@@ -565,7 +565,7 @@ Cluster 8 contains many winning squads, such as Bayern of 2012/13, Real Madrid o
 as well as Chelsea prior to and just after winning the CL (though, curiously, the victorious squad
 is missing).
 
-Let's try and have a closer look at the clusters and compare how those teams play.
+Let's try and have a closer look at the clusters and compare how teams in each cluster play.
 
 #### Short Passes
 
@@ -578,8 +578,8 @@ which would be inherently bad at passing. Some teams do make fewer passes per ga
 obviously cannot have many successful passes, but their relative accuracy is not inherently worse.
 
 Clubs from cluster number 4 make the fewest passes. But, as we've established before, cluster 4
-contains small clubs from less smaller leagues and those clubs usually have less of a chance
-and spend the majority of the game without possesion of the ball.
+contains small clubs from smaller leagues and those clubs usually have less of a chance competing
+agains major clubs and spend the majority of the game without possesion of the ball.
 
 Clubs in clusters 10 and 11 make the most pass attempts, but, as we've said before, those clusters
 contain mostly Pep Guardiola's teams.
@@ -629,6 +629,9 @@ Clubs from cluster 4 have low possession rates.
 
 ![Counter Attack Goals](plots/CounterAttackGoals_champions_league.png)
 
+It is important to mention that this graph contains the total number of
+goals per season, not goals per match.
+
 Since each team only plays a few matches in the Champions League,
 the results are unconclusive. Smaller teams from cluster 4 didn't
 score many goals, and a portion of not many is unlikely to be a lot.
@@ -647,7 +650,7 @@ so counter attacks can be expected from this cluster.
 
 Teams with higher possession rates tend to rack up more shots per game.
 Teams in clusters 8, 10 and 11 have the most shots per game. Clusters 10, 11
-contains possession-focused teams. Cluster 8 contains strong squads which can
+contain possession-focused teams. Cluster 8 contains strong squads which can
 afford to play offensive football.
 
 Teams in clusters 10 and 11 tend to score the most goals per game. Even the strong
