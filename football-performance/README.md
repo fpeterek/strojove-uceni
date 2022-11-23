@@ -4,6 +4,8 @@ Dataset source: https://www.kaggle.com/datasets/gurpreetsdeol/performance-data-o
 
 K-Means and DBSCAN parameters were chosen empirically based on what configuration yielded reasonable results.
 
+No preprocessing was necessary as the data was already presented to us in a reasonable format.
+
 # Unprocessed
 
 First, we try to apply clustering algorithms on an unprocessed dataset.
