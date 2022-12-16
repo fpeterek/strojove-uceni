@@ -76,7 +76,7 @@ def print_class_name(fn):
 @print_class_name
 def test_configs(cl, configs, X, y):
     for conf in configs:
-        score = test_classifier(lambda: cl(**conf), X, y)
+        score = test_classifier(X, y, lambda: cl(**conf))
         print(f'{cl.__name__} {conf}: {score}')
 
 

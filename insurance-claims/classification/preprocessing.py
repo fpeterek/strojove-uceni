@@ -25,15 +25,23 @@ def parse_power(power: str) -> float:
 
 
 def parse_bool(boolean: str) -> bool:
-    pass
+    return int(boolean == 'Yes')
 
 
 def parse_brake_type(brakes: str) -> int:
-    1 if brakes == 'Disc' else 0
+    return int(brakes == 'Disc')
 
 
 def parse_transmission_type(transmission: str) -> int:
-    1 if transmission == 'Automatic' else 0
+    return int(transmission == 'Automatic')
+
+
+def convert_with(ds, col, fn) -> pd.DataFrame:
+    ds[col] = ds[col].map(fn)
+
+
+def convert_to_bool(ds, col) -> pd.DataFrame:
+    convert_with(ds, col, parse_bool)
 
 
 def preprocess(ds) -> pd.DataFrame:
@@ -51,25 +59,30 @@ def preprocess(ds) -> pd.DataFrame:
     ds = one_hot_encode(ds, 'fuel_type')
     ds = one_hot_encode(ds, 'steering_type')
 
-    ds['max_torque'].map(parse_torque)
-    ds['max_power'].map(parse_power)
+    convert_with(ds, 'max_torque', parse_torque)
+    convert_with(ds, 'max_power', parse_power)
 
-    ds['is_esc'].map(parse_bool)
-    ds['is_adjustable_steering'].map(parse_bool)
-    ds['is_tpms'].map(parse_bool)
-    ds['is_parking_sensors'].map(parse_bool)
-    ds['is_parking_camera'].map(parse_bool)
-    ds['is_front_fog_lights'].map(parse_bool)
-    ds['is_rear_window_wiper'].map(parse_bool)
-    ds['is_rear_window_defogger'].map(parse_bool)
-    ds['is_brake_assist'].map(parse_bool)
-    ds['is_power_door_locks'].map(parse_bool)
-    ds['is_central_locking'].map(parse_bool)
-    ds['is_driver_seat_height_adjustable'].map(parse_bool)
-    ds['is_day_night_rear_view_mirror'].map(parse_bool)
-    ds['is_speed_alert'].map(parse_bool)
+    convert_to_bool(ds, 'is_esc')
+    convert_to_bool(ds, 'is_adjustable_steering')
+    convert_to_bool(ds, 'is_tpms')
+    convert_to_bool(ds, 'is_parking_sensors')
+    convert_to_bool(ds, 'is_parking_camera')
+    convert_to_bool(ds, 'is_front_fog_lights')
+    convert_to_bool(ds, 'is_rear_window_wiper')
+    convert_to_bool(ds, 'is_rear_window_defogger')
+    convert_to_bool(ds, 'is_brake_assist')
+    convert_to_bool(ds, 'is_power_door_locks')
+    convert_to_bool(ds, 'is_central_locking')
+    convert_to_bool(ds, 'is_driver_seat_height_adjustable')
+    convert_to_bool(ds, 'is_day_night_rear_view_mirror')
+    convert_to_bool(ds, 'is_speed_alert')
 
-    ds['rear_brakes_type'].map(parse_brake_type)
-    ds['transmission_type'].map(parse_transmission_type)
+    convert_with(ds, 'rear_brakes_type', parse_brake_type)
+    convert_with(ds, 'transmission_type', parse_transmission_type)
+
+    ds = ds.copy()
+    print(ds.head())
+    for t in ds.dtypes:
+        print(t)
 
     return ds
