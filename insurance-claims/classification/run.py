@@ -1,3 +1,5 @@
+from collections import Counter
+
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import KFold
@@ -5,6 +7,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import f1_score
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
+from sklearn.svm import SVC
 
 from preprocessing import preprocess
 
@@ -56,6 +59,9 @@ def test_classifier(X, y, cons_classifier):
         classifier.fit(X_train, y_train)
 
         pred = classifier.predict(X_test)
+        # counter = Counter(pred)
+        # print(pred)
+        # print(counter)
 
         scores.append(f1_score(y_test, pred))
 
@@ -80,6 +86,7 @@ def test_configs(cl, configs, X, y):
     for conf in configs:
         score = test_classifier(X, y, lambda: cl(**conf))
         print(f'{cl.__name__} {conf}: {score:.3f}')
+        # print(f'{cl.__name__} {conf}: {score}')
 
 
 def test_decision_tree(X, y):
@@ -112,41 +119,85 @@ def test_random_forest(X, y):
     test_configs(RandomForestClassifier, configs, X, y)
 
 
-def union(d1: dict, d2: dict):
-    d = d1.copy()
-    d.update(d2)
-    return d
+def test_svm(X, y):
+    configs = [
+            {'C': 1.0, 'kernel': 'rbf', 'gamma': 'scale'},
+            # {'C': 10.0, 'kernel': 'rbf', 'gamma': 'scale'},
+            # {'C': 100.0, 'kernel': 'rbf', 'gamma': 'scale'},
+            {'C': 1.0, 'kernel': 'rbf', 'gamma': 'auto'},
+            # {'C': 10.0, 'kernel': 'rbf', 'gamma': 'auto'},
+            # {'C': 100.0, 'kernel': 'rbf', 'gamma': 'auto'},
+
+            {'C': 1.0, 'kernel': 'linear', 'gamma': 'scale'},
+            # {'C': 10.0, 'kernel': 'linear', 'gamma': 'scale'},
+            # {'C': 100.0, 'kernel': 'linear', 'gamma': 'scale'},
+            {'C': 1.0, 'kernel': 'linear', 'gamma': 'auto'},
+            # {'C': 10.0, 'kernel': 'linear', 'gamma': 'auto'},
+            # {'C': 100.0, 'kernel': 'linear', 'gamma': 'auto'},
+
+            {'C': 1.0, 'kernel': 'poly', 'degree': 3, 'gamma': 'scale'},
+            # {'C': 10.0, 'kernel': 'poly', 'degree': 3, 'gamma': 'scale'},
+            # {'C': 100.0, 'kernel': 'poly', 'degree': 3, 'gamma': 'scale'},
+
+            {'C': 1.0, 'kernel': 'poly', 'degree': 4, 'gamma': 'scale'},
+            # {'C': 10.0, 'kernel': 'poly', 'degree': 4, 'gamma': 'scale'},
+            # {'C': 100.0, 'kernel': 'poly', 'degree': 4, 'gamma': 'scale'},
+
+            {'C': 1.0, 'kernel': 'sigmoid', 'gamma': 'scale'},
+            # {'C': 10.0, 'kernel': 'sigmoid', 'gamma': 'scale'},
+            # {'C': 100.0, 'kernel': 'sigmoid', 'gamma': 'scale'},
+
+            {'C': 1.0, 'kernel': 'sigmoid', 'gamma': 'auto'},
+            # {'C': 10.0, 'kernel': 'sigmoid', 'gamma': 'auto'},
+            # {'C': 100.0, 'kernel': 'sigmoid', 'gamma': 'auto'},
+            ]
+    test_configs(SVC, configs, X, y)
 
 
 def test_xgb(X,  y):
     base = {'objective': 'binary:hinge', 'booster': 'gbtree'}
     configs = [
-            union(base, {'max_depth': 10, 'num_parallel_tree': 1}),
-            union(base, {'max_depth': 45, 'num_parallel_tree': 1}),
-            union(base, {'max_depth': 50, 'num_parallel_tree': 1}),
-            union(base, {'max_depth': 55, 'num_parallel_tree': 1}),
-            union(base, {'max_depth': 73, 'num_parallel_tree': 1}),
+            # {'max_depth': 10, 'num_parallel_tree': 1},
+            # {'max_depth': 45, 'num_parallel_tree': 1},
+            # {'max_depth': 50, 'num_parallel_tree': 1},
+            # {'max_depth': 55, 'num_parallel_tree': 1},
+            # {'max_depth': 73, 'num_parallel_tree': 1},
 
-            union(base, {'max_depth': 10, 'num_parallel_tree': 3}),
-            union(base, {'max_depth': 45, 'num_parallel_tree': 3}),
-            union(base, {'max_depth': 50, 'num_parallel_tree': 3}),
-            union(base, {'max_depth': 55, 'num_parallel_tree': 3}),
-            union(base, {'max_depth': 73, 'num_parallel_tree': 3}),
+            # {'max_depth': 10, 'num_parallel_tree': 3},
+            # {'max_depth': 45, 'num_parallel_tree': 3},
+            # {'max_depth': 50, 'num_parallel_tree': 3},
+            # {'max_depth': 55, 'num_parallel_tree': 3},
+            # {'max_depth': 73, 'num_parallel_tree': 3},
 
-            union(base, {'max_depth': 10, 'num_parallel_tree': 10}),
-            union(base, {'max_depth': 45, 'num_parallel_tree': 10}),
-            union(base, {'max_depth': 50, 'num_parallel_tree': 10}),
-            union(base, {'max_depth': 55, 'num_parallel_tree': 10}),
-            union(base, {'max_depth': 73, 'num_parallel_tree': 10}),
+            # {'max_depth': 10, 'num_parallel_tree': 10},
+            # {'max_depth': 45, 'num_parallel_tree': 10},
+            # {'max_depth': 50, 'num_parallel_tree': 10},
+            # {'max_depth': 55, 'num_parallel_tree': 10},
+            # {'max_depth': 73, 'num_parallel_tree': 10},
+
+            # {'max_depth': 55, 'num_parallel_tree': 1, 'eta': 0.1},
+            # {'max_depth': 55, 'num_parallel_tree': 1, 'eta': 1.2},
+
+            {'max_depth': 55, 'num_parallel_tree': 1, 'eta': 0.6},
+
+            {'max_depth': 55, 'num_parallel_tree': 1, 'eta': 0.6, 'gamma': 0.5},
+            {'max_depth': 55, 'num_parallel_tree': 1, 'eta': 0.6, 'gamma': 1.0},
+            {'max_depth': 55, 'num_parallel_tree': 1, 'eta': 0.6, 'gamma': 1.5},
+
+            {'max_depth': 55, 'num_parallel_tree': 1, 'eta': 0.6, 'lambda': 1.5, 'alpha': 0.5},
             ]
+
+    for conf in configs:
+        conf.update(base)
 
     test_configs(XGBClassifier, configs, X, y)
 
 
 def test_all(X, y):
-    # test_decision_tree(X, y)
-    # test_random_forest(X, y)
+    test_decision_tree(X, y)
+    test_random_forest(X, y)
     test_xgb(X, y)
+    test_svm(X, y)
 
 
 def run():
