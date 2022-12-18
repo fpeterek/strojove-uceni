@@ -4,6 +4,7 @@ from sklearn.model_selection import KFold
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import f1_score
 from sklearn.ensemble import RandomForestClassifier
+from xgboost import XGBClassifier
 
 from preprocessing import preprocess
 
@@ -64,9 +65,10 @@ def test_classifier(X, y, cons_classifier):
 def print_class_name(fn):
 
     def test_fn(cl, configs, X, y):
-        print(f'--------------------- {cl.__name__} ---------------------')
+        padding = '---------------------'
+        print(f'{padding} {cl.__name__} {padding}')
         retval = fn(cl, configs, X, y)
-        print('---------------------------------------------------------')
+        print(f'{padding}{"-" * (len(cl.__name__) + 2)}{padding}')
         print()
         return retval
 
@@ -77,36 +79,74 @@ def print_class_name(fn):
 def test_configs(cl, configs, X, y):
     for conf in configs:
         score = test_classifier(X, y, lambda: cl(**conf))
-        print(f'{cl.__name__} {conf}: {score}')
+        print(f'{cl.__name__} {conf}: {score:.3f}')
 
 
 def test_decision_tree(X, y):
-    configs = [
-            {'max_depth': 4, },
-            {'max_depth': 5, },
-            {'max_depth': 6, },
-            {'max_depth': 7, },
-            {'max_depth': 8, },
-            ]
+    configs = [{'max_depth': min(x, 73)} for x in range(5, 80, 5)]
     test_configs(DecisionTreeClassifier, configs, X, y)
 
 
 def test_random_forest(X, y):
     configs = [
-            {'max_depth': 4, 'n_estimators': 10},
-            {'max_depth': 6, 'n_estimators': 10},
-            {'max_depth': 8, 'n_estimators': 10},
+            {'max_depth': 45, 'n_estimators': 3},
+            {'max_depth': 50, 'n_estimators': 3},
+            {'max_depth': 55, 'n_estimators': 3},
 
-            {'max_depth': 4, 'n_estimators': 100},
-            {'max_depth': 6, 'n_estimators': 100},
-            {'max_depth': 8, 'n_estimators': 100},
+            {'max_depth': 45, 'n_estimators': 5},
+            {'max_depth': 50, 'n_estimators': 5},
+            {'max_depth': 55, 'n_estimators': 5},
+
+            {'max_depth': 45, 'n_estimators': 10},
+            {'max_depth': 50, 'n_estimators': 10},
+            {'max_depth': 55, 'n_estimators': 10},
+
+            {'max_depth': 45, 'n_estimators': 50},
+            {'max_depth': 50, 'n_estimators': 50},
+            {'max_depth': 55, 'n_estimators': 50},
+
+            {'max_depth': 45, 'n_estimators': 100},
+            {'max_depth': 50, 'n_estimators': 100},
+            {'max_depth': 55, 'n_estimators': 100},
             ]
     test_configs(RandomForestClassifier, configs, X, y)
 
 
+def union(d1: dict, d2: dict):
+    d = d1.copy()
+    d.update(d2)
+    return d
+
+
+def test_xgb(X,  y):
+    base = {'objective': 'binary:hinge', 'booster': 'gbtree'}
+    configs = [
+            union(base, {'max_depth': 10, 'num_parallel_tree': 1}),
+            union(base, {'max_depth': 45, 'num_parallel_tree': 1}),
+            union(base, {'max_depth': 50, 'num_parallel_tree': 1}),
+            union(base, {'max_depth': 55, 'num_parallel_tree': 1}),
+            union(base, {'max_depth': 73, 'num_parallel_tree': 1}),
+
+            union(base, {'max_depth': 10, 'num_parallel_tree': 3}),
+            union(base, {'max_depth': 45, 'num_parallel_tree': 3}),
+            union(base, {'max_depth': 50, 'num_parallel_tree': 3}),
+            union(base, {'max_depth': 55, 'num_parallel_tree': 3}),
+            union(base, {'max_depth': 73, 'num_parallel_tree': 3}),
+
+            union(base, {'max_depth': 10, 'num_parallel_tree': 10}),
+            union(base, {'max_depth': 45, 'num_parallel_tree': 10}),
+            union(base, {'max_depth': 50, 'num_parallel_tree': 10}),
+            union(base, {'max_depth': 55, 'num_parallel_tree': 10}),
+            union(base, {'max_depth': 73, 'num_parallel_tree': 10}),
+            ]
+
+    test_configs(XGBClassifier, configs, X, y)
+
+
 def test_all(X, y):
-    test_decision_tree(X, y)
-    test_random_forest(X, y)
+    # test_decision_tree(X, y)
+    # test_random_forest(X, y)
+    test_xgb(X, y)
 
 
 def run():
