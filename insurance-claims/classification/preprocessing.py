@@ -49,7 +49,7 @@ def preprocess(ds) -> pd.DataFrame:
     cols.remove('policy_id')
     cols.remove('model')
     cols.remove('engine_type')
-    cols.remove('is_power_steering')
+    cols.remove('steering_type')
 
     ds = ds[cols]
 
@@ -57,11 +57,11 @@ def preprocess(ds) -> pd.DataFrame:
     ds = one_hot_encode(ds, 'area_cluster')
     ds = one_hot_encode(ds, 'make')
     ds = one_hot_encode(ds, 'fuel_type')
-    ds = one_hot_encode(ds, 'steering_type')
 
     convert_with(ds, 'max_torque', parse_torque)
     convert_with(ds, 'max_power', parse_power)
 
+    convert_to_bool(ds, 'is_power_steering')
     convert_to_bool(ds, 'is_esc')
     convert_to_bool(ds, 'is_adjustable_steering')
     convert_to_bool(ds, 'is_tpms')

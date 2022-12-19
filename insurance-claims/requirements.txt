@@ -7,3 +7,4 @@ scipy==1.9.3
 numpy==1.23.4
 pandas==1.5.1
 seaborn==0.12.1
+imbalanced-learn==0.10.0
