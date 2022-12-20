@@ -52,7 +52,7 @@ class ClassifierStats:
         fscore = self.fscore
         accuracy = self.acc
         counter = self.counter
-        return f'(fscore={fscore:.3}, accuracy={accuracy:.3}, {counter=})'
+        return f'(fscore={fscore:.3f}, accuracy={accuracy:.3f}, {counter=})'
 
 
 def merge_counters(d1: Counter, d2: Counter) -> Counter:
@@ -106,8 +106,14 @@ def print_class_name(fn):
     return test_fn
 
 
+def as_str(value):
+    if not isinstance(value, float):
+        return str(value)
+    return f'{value:.3f}'
+
+
 def print_row(row):
-    row = map(str, row)
+    row = map(as_str, row)
     print('| ', ' | '.join(row), ' |', sep='')
 
 
@@ -192,7 +198,7 @@ def test_svm(X, y, preprocess):
             # {'C': 100.0, 'kernel': 'poly', 'degree': 4, 'gamma': 'scale'},
 
             {'C': 1.0, 'kernel': 'sigmoid', 'gamma': 'scale'},
-            # {'C': 10.0, 'kernel': 'sigmoid', 'gamma': 'scale'},
+            {'C': 10.0, 'kernel': 'sigmoid', 'gamma': 'scale'},
             # {'C': 100.0, 'kernel': 'sigmoid', 'gamma': 'scale'},
 
             # {'C': 1.0, 'kernel': 'sigmoid', 'gamma': 'auto'},
