@@ -51,7 +51,7 @@ class ClassifierStats:
     def __str__(self):
         fscore = self.fscore
         accuracy = self.acc
-        counter = dict(self.counter)
+        counter = self.counter
         return f'(fscore={fscore:.3}, accuracy={accuracy:.3}, {counter=})'
 
 
@@ -90,7 +90,7 @@ def test_classifier(X, y, cons_classifier, preprocess):
 
     fscore = avg(fscores)
     accuracy = avg(accuracies)
-    return ClassifierStats(fscore, accuracy, counter)
+    return ClassifierStats(fscore, accuracy, dict(counter))
 
 
 def print_class_name(fn):
