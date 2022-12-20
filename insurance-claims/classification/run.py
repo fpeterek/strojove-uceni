@@ -51,8 +51,8 @@ class ClassifierStats:
     def __str__(self):
         fscore = self.fscore
         accuracy = self.acc
-        counter = self.counter
-        return f'({fscore=:.3}, {accuracy=:.3}, {counter=})'
+        counter = dict(self.counter)
+        return f'(fscore={fscore:.3}, accuracy={accuracy:.3}, {counter=})'
 
 
 def merge_counters(d1: Counter, d2: Counter) -> Counter:
@@ -63,6 +63,8 @@ def merge_counters(d1: Counter, d2: Counter) -> Counter:
     return d
 
 
+# We only use a couple splits in K-fold validation, because the
+# training process takes a very long time
 def test_classifier(X, y, cons_classifier, preprocess):
     kf = KFold(n_splits=3)
     fscores = []
@@ -136,7 +138,6 @@ def test_configs(cl, configs, X, y, preprocess):
     for conf in configs:
         res = test_classifier(X, y, lambda: cl(**conf), preprocess)
         results.append(res)
-        # print(f'{conf}: {res}')
     as_table(configs, results)
 
 
@@ -149,7 +150,7 @@ def test_decision_tree(X, y, preprocess, max_depth):
 def test_forest_depths(X, y, preprocess, depths):
     configs = []
     for depth in depths:
-        for est in [3, 5, 10, 50, 100]:
+        for est in [3, 5, 10, 100]:
             conf = {'max_depth': depth, 'n_estimators': est}
             configs.append(conf)
 
@@ -164,19 +165,21 @@ def test_random_forest_pca(X, y, preprocess):
     test_forest_depths(X, y, preprocess, [10, 15, 20])
 
 
+# This takes a very long time, so we only test a couple configurations
+# All of the configurations I tested performed horribly
 def test_svm(X, y, preprocess):
     configs = [
             {'C': 1.0, 'kernel': 'rbf', 'gamma': 'scale'},
             # {'C': 10.0, 'kernel': 'rbf', 'gamma': 'scale'},
             # {'C': 100.0, 'kernel': 'rbf', 'gamma': 'scale'},
-            {'C': 1.0, 'kernel': 'rbf', 'gamma': 'auto'},
+            # {'C': 1.0, 'kernel': 'rbf', 'gamma': 'auto'},
             # {'C': 10.0, 'kernel': 'rbf', 'gamma': 'auto'},
             # {'C': 100.0, 'kernel': 'rbf', 'gamma': 'auto'},
 
             {'C': 1.0, 'kernel': 'linear', 'gamma': 'scale'},
             # {'C': 10.0, 'kernel': 'linear', 'gamma': 'scale'},
             # {'C': 100.0, 'kernel': 'linear', 'gamma': 'scale'},
-            {'C': 1.0, 'kernel': 'linear', 'gamma': 'auto'},
+            # {'C': 1.0, 'kernel': 'linear', 'gamma': 'auto'},
             # {'C': 10.0, 'kernel': 'linear', 'gamma': 'auto'},
             # {'C': 100.0, 'kernel': 'linear', 'gamma': 'auto'},
 
@@ -184,7 +187,7 @@ def test_svm(X, y, preprocess):
             # {'C': 10.0, 'kernel': 'poly', 'degree': 3, 'gamma': 'scale'},
             # {'C': 100.0, 'kernel': 'poly', 'degree': 3, 'gamma': 'scale'},
 
-            {'C': 1.0, 'kernel': 'poly', 'degree': 4, 'gamma': 'scale'},
+            # {'C': 1.0, 'kernel': 'poly', 'degree': 4, 'gamma': 'scale'},
             # {'C': 10.0, 'kernel': 'poly', 'degree': 4, 'gamma': 'scale'},
             # {'C': 100.0, 'kernel': 'poly', 'degree': 4, 'gamma': 'scale'},
 
@@ -192,7 +195,7 @@ def test_svm(X, y, preprocess):
             # {'C': 10.0, 'kernel': 'sigmoid', 'gamma': 'scale'},
             # {'C': 100.0, 'kernel': 'sigmoid', 'gamma': 'scale'},
 
-            {'C': 1.0, 'kernel': 'sigmoid', 'gamma': 'auto'},
+            # {'C': 1.0, 'kernel': 'sigmoid', 'gamma': 'auto'},
             # {'C': 10.0, 'kernel': 'sigmoid', 'gamma': 'auto'},
             # {'C': 100.0, 'kernel': 'sigmoid', 'gamma': 'auto'},
             ]
@@ -223,7 +226,7 @@ def test_xgb_confs(X,  y, preprocess, depths, tree_count):
 
 
 def test_xgb(X, y, preprocess):
-    test_xgb_confs(X, y, preprocess, [55], [1])
+    test_xgb_confs(X, y, preprocess, [55], [1, 3, 10])
 
 
 def test_xgb_pca(X, y, preprocess):
@@ -236,10 +239,10 @@ def test_mlp(X, y, preprocess, n):
     activ = 'activation'
 
     configs = [
-            {layers: (n,), solver: 'adam', activ: 'relu'},
-            {layers: (n,), solver: 'adam', activ: 'logistic'},
-            {layers: (n,), solver: 'lbfgs', activ: 'relu'},
-            {layers: (n,), solver: 'lbfgs', activ: 'logistic'},
+            # {layers: (n,), solver: 'adam', activ: 'relu'},
+            # {layers: (n,), solver: 'adam', activ: 'logistic'},
+            # {layers: (n,), solver: 'lbfgs', activ: 'relu'},
+            # {layers: (n,), solver: 'lbfgs', activ: 'logistic'},
 
             {layers: (2*n,), solver: 'adam', activ: 'relu'},
             {layers: (2*n,), solver: 'adam', activ: 'logistic'},
@@ -256,10 +259,10 @@ def test_mlp(X, y, preprocess, n):
             {layers: (3*n,), solver: 'lbfgs', activ: 'relu'},
             {layers: (3*n,), solver: 'lbfgs', activ: 'logistic'},
 
-            {layers: (4*n,), solver: 'adam', activ: 'relu'},
-            {layers: (4*n,), solver: 'adam', activ: 'logistic'},
-            {layers: (4*n,), solver: 'lbfgs', activ: 'relu'},
-            {layers: (4*n,), solver: 'lbfgs', activ: 'logistic'},
+            # {layers: (4*n,), solver: 'adam', activ: 'relu'},
+            # {layers: (4*n,), solver: 'adam', activ: 'logistic'},
+            # {layers: (4*n,), solver: 'lbfgs', activ: 'relu'},
+            # {layers: (4*n,), solver: 'lbfgs', activ: 'logistic'},
             ]
 
     test_configs(MLPClassifier, configs, X, y, preprocess)
@@ -276,6 +279,8 @@ def test_all(X, y, preprocess=None):
     test_mlp(X, y, preprocess, n=73)
 
 
+# Analysis of datasets with reduced dimensions requires different
+# configurations due to a different number of attributes
 def test_all_pca(X, y, preprocess=None):
     if preprocess is None:
         preprocess = []
@@ -311,6 +316,9 @@ def run():
     warnings.filterwarnings(action='ignore', category=ConvergenceWarning)
     X, y = load_xy('data/train.csv')
 
+    counter = dict(Counter(y))
+    print(f'Insurance claims: {counter}')
+
     print('------------------------------------ Scaled Data -------------------------------------')
     print()
     test_all(X, y, [scale_ds])
@@ -319,4 +327,4 @@ def run():
     test_all(X, y, [enhance_ds, scale_ds])
     print('---------------------------------------- PCA -----------------------------------------')
     print()
-    test_all_pca(X, y, [enhance_ds, scale_ds, reduce_dim])
+    test_all_pca(X, y, [enhance_ds, reduce_dim, scale_ds])
