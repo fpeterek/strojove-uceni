@@ -16,6 +16,7 @@ from imblearn.over_sampling import SMOTE
 from sklearn.decomposition import PCA
 
 from preprocessing import preprocess
+from every_other import EveryOtherClassifier
 
 
 def avg(iterable):
@@ -274,6 +275,13 @@ def test_mlp(X, y, preprocess, n):
     test_configs(MLPClassifier, configs, X, y, preprocess)
 
 
+def test_mark_every_second_as_claim(X, y, preprocess=None):
+    if preprocess is None:
+        preprocess = []
+
+    test_configs(EveryOtherClassifier, [{}], X, y, preprocess)
+
+
 def test_all(X, y, preprocess=None):
     if preprocess is None:
         preprocess = []
@@ -324,6 +332,8 @@ def run():
 
     counter = dict(Counter(y))
     print(f'Insurance claims: {counter}')
+
+    test_mark_every_second_as_claim(X, y)
 
     print('------------------------------------ Scaled Data -------------------------------------')
     print()

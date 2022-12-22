@@ -66,7 +66,7 @@ Five classifiers were used and compared in the project. These classifiers includ
 
 ## Scaled Data
 
-First, we will try to trained the classifiers on scaled data. The data is scaled using an
+First, we will try to train the classifiers on scaled data. The data is scaled using an
 `sklearn.preprocessing.StandardScaler`. There are no attempts to classify unscaled data,
 all training and classification is performed on rescaled datasets.
 
@@ -75,8 +75,9 @@ all training and classification is performed on rescaled datasets.
 We construct multiple decision trees with their depths equal to multiples of five.
 From the table, we can see that whilst the F-score increases for deeper trees,
 the accuracy actually decreases. Due to the imbalance present in the data, a classifier
-which classifies everything as a non-claim will always perform very well, and there's a lot
-to lose when training our own classifiers.
+which classifies everything as a non-claim will always perform very well, and there's plenty
+of opportunities to lose accuracy when training custom classifiers compared to just classifying
+everything as a non-claim.
 
 | max_depth | f1 score | accuracy | counter |
 | --- | --- | --- | --- |
@@ -106,9 +107,10 @@ although they have a lower F-score.
 
 In terms of F-score, a decision forest does not outperform a single tree.
 
-Tree depth seems to have less of an effect than the number of estimators. Increasing
-the number of trees in the forest causes the classifier to classify more and more
-records as non-claims, decreasing F-score and increasing accuracy.
+Tree depth seems to have less of an effect than the number of estimators, at least in our
+set with a limited number of configurations. Increasing the number of trees in the forest
+causes the classifier to classify more and more records as non-claims, decreasing F-score
+and increasing accuracy.
 
 | max_depth | n_estimators | f1 score | accuracy | counter |
 | --- | --- | --- | --- | --- |
@@ -129,8 +131,8 @@ records as non-claims, decreasing F-score and increasing accuracy.
 
 We set the objective to `binary:hinge` to obtain binary results.
 
-We experiment with the number of trees in the forest, `alpha`, `lambda`
-and `gamma` training parameters. Maximum depth is constant across all sets and is
+We experiment with the number of trees in the forest and `alpha`, `lambda`
+and `gamma` training parameters. Maximum depth is constant across all configurations and is
 set to `55`.
 
 | alpha | objective | lambda | eta | booster | num_parallel_tree | max_depth | gamma | f1 score | accuracy | counter |
@@ -160,7 +162,7 @@ as non-claims. Increasing the number of trees in the forest results in a subtle 
 ### SVC
 
 The radial basis function and the linear function kernel live in a utopian universe where cyclists
-actually abide by the traffic laws (or better yet, do not exist at all), and people use their turn signals.
+actually abide by the traffic laws (or better yet, do not exist at all), and drivers use their turn signals.
 But alas, the classifier which only predicts zeroes is the most accurate one we've had so far.
 
 Since the sigmoid kernel finally predicts a couple claims, we can also try increasing the `C` parameter.
@@ -177,10 +179,11 @@ Increasing `C` leads to a higher F-score and more claim predictions.
 ### Multi-layer Perceptron
 
 The neural network appears to classify almost everything as a non-claim. A rather surprising result
-is that we get a better classifier by increasing the number of hidden layers. Or, at least the F-score
+is that we get a better classifier by increasing the number of hidden layers. Or at least the F-score
 improves and the classifier starts classifying some records as claims.
 
-RELU appears to perform better than sigmoid, at least in terms of F-score.
+Choosing ReLU as the activation function results in higher F1-score but equivalent accuracy compared
+to the Sigmoid function.
 
 | solver | activation | hidden_layer_sizes | f1 score | accuracy | counter |
 | --- | --- | --- | --- | --- | --- |
@@ -199,7 +202,7 @@ RELU appears to perform better than sigmoid, at least in terms of F-score.
 
 ## Data enhancement
 
-The next experiment we try is enhancing the data using the SMOTE algorithm to obtain a balanced training
+As our next experiment, we try to enhance the data using the SMOTE algorithm to obtain a balanced training
 set. The enhanced dataset is then scaled, as in the previous experiment.
 
 ### DecisionTree
@@ -226,8 +229,6 @@ of 25 and more. The classifier still doesn't perform well.
 | 70 | 0.088 | 0.865 | {0: 53691, 1: 4901} |
 
 ### RandomForest
-
-Yet again, the maximum depths are chosen by picking reasonable depths from the previous test.
 
 Unlike in the first experiment on the original dataset, RandomForest manages to outperform
 a single DecisionTree in terms of F-score (if we disregard the first two very inaccurate trees).
@@ -278,7 +279,7 @@ appears to have little to no effect.
 
 ### SVC
 
-The Support Vector Machine performs horribly regardless of the kernel or training parameters.
+The Support Vector Machine performs horribly regardless of choice of kernel or training parameters.
 It's only slightly more accurate than marking every second record as a claim.
 
 | degree | kernel | gamma | C | f1 score | accuracy | counter |
@@ -296,7 +297,7 @@ A Neural Network based classifier doesn't perform well, either.
 The adam optimizer reaches a higher accuracy but a lower F-score than the lbfgs optimizer.
 Yet again, increasing the number of hidden layers improves the network.
 
-As for the activation function, ReLU seems to be slightly better than Sigmoid.
+As for the activation function, ReLU seems to work slightly better than Sigmoid.
 
 | solver | activation | hidden_layer_sizes | f1 score | accuracy | counter |
 | --- | --- | --- | --- | --- | --- |
@@ -315,11 +316,11 @@ As for the activation function, ReLU seems to be slightly better than Sigmoid.
 
 ## Dimension Reduction
 
-The last experiment we try is performing dimension reduction using Principle Component Analysis.
+In our last experiment, we try to perfrom dimension reduction using Principle Component Analysis.
 Dimension reduction is performed after data enhancement, but before scaling.
 
 The dataset is reduced to 20 dimensions. Due to time/performance constraints, no attempts were made
-to reduce the dataset to multiple sizes.
+to reduce the dataset to other sizes.
 
 ### DecisionTree
 
@@ -364,6 +365,9 @@ is higher than that of the RandomForest. Still, the models aren't very accurate.
 Deeper trees perform better in terms of accuracy and only slightly worse in terms of F1-score, however,
 the number of trees in the forest seems to have little to no noticeable effect. Increasing `alpha` and
 `lambda` results in a slightly better model. Increasing `gamma` has little to no effect.
+
+XGB based models perform the best of all tested classifiers in terms of accuracy on the dataset
+with a reduced number of dimensions.
 
 | alpha | objective | lambda | eta | booster | num_parallel_tree | max_depth | gamma | f1 score | accuracy | counter |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -428,7 +432,7 @@ The Support Vector Machine performs badly. The sigmoid kernel appears to perform
 ### Multi-layer Perceptron
 
 For the first time, a neural network with more than one hidden layer doesn't perform all
-that much better. ReLU appears to perform slightly better than Sigmoid. Overall, the MLP
+that much better. ReLU appears to fit the task slightly better than Sigmoid. Overall, the MLP
 didn't perform very well.
 
 | solver | activation | hidden_layer_sizes | f1 score | accuracy | counter |
@@ -448,4 +452,20 @@ didn't perform very well.
 
 ## Conclusion
 
-TODO
+Due to the strong imbalance present in the data, the most accurate classifier predicts `0` (a non-claim)
+for every input. Tree-based methods stopped improving after a certain depth was reached - thus, we have
+reason to believe that about two thirds of the attribute are actually unimportant in predicting whether
+the customer is going to file a claim. However, dimension reduction down to 20 attributes seemed to worsen
+the predictors by a large margin. If the goal was to create a classifier of the highest possible accuracy,
+it would be better to try a less aggressive approach dimension reduction, or to just avoid PCA and instead
+select the most important attributes and drop the rest. A larger neural network with multiple hidden layers
+or XGBoost would probably perform the best after some parameter tuning.
+
+### Addendum
+
+Out of curiosity, I decided to test how well a classifier which marked every other record as a claim would
+perform.
+
+| f1 score | accuracy | counter |
+| --- | --- | --- |
+| 0.115 | 0.501 | {1: 29297, 0: 29295} |
